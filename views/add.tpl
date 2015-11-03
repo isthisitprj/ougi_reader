@@ -5,7 +5,7 @@
 
     <div class="col-md-5">
 
-        <form action="/feeds/add" method="post">
+        <form action="/add" method="post">
 
             <div class="form-group">
                 <label for="title">タイトル</label>
@@ -14,7 +14,7 @@
 
             <div class="form-group">
                 <label for="url">URL</label>
-                <input id="url" name="url" type="text" class="form-control" maxlength="10" placeholder="URLを入力">
+                <input id="url" name="url" type="text" class="form-control" maxlength="2000" placeholder="URLを入力">
             </div>
 
 
