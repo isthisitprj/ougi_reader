@@ -5,7 +5,7 @@
 
     <div class="col-md-5">
 
-        <form action="/add" method="post">
+        <form action="./add" method="post">
 
             <div class="form-group">
                 <label for="title">タイトル</label>

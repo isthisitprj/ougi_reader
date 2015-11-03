@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-
 import bottle
 from bottle import get, post, run, view
 from bottle import request, template, redirect
 from bottle import HTTPError
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Unicode, DateTime, UnicodeText, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relation, backref
+from sqlalchemy import create_engine
 
 from bottle.ext import sqlalchemy
 
@@ -20,9 +16,10 @@ from wtforms import StringField, IntegerField, TextAreaField
 import models
 import feedmanager
 
-Base = declarative_base()
-#engine = create_engine('sqlite:///:memory:', echo=True)
+
+Base = models.Base
 engine = create_engine('mysql://ougi:ougi_reader0@localhost:3306/ougi_reader?charset=utf8', echo=False)
+
 # bottle-sqlalchemyの設定
 plugin = sqlalchemy.Plugin(
     engine,
@@ -83,9 +80,9 @@ def create(db):
             title=form.title.data,
             url=form.url.data,
         )
-        feedmanager.setup_feed(feed)
-
-
+        feed = feedmanager.setup_feed(feed)
+        if feed is None:
+            return template('add', form=form, request=request)
 
         # 一覧画面へリダイレクト
         redirect("./" + str(feed.id))
@@ -101,7 +98,7 @@ def edit(db, feed_id):
         return HTTPError(404, 'Feed is not found.')
 
     # feedの更新
-    feedmanager.update_feeds([feed])
+    feedmanager.update_feed(feed)
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画

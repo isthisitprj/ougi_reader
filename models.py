@@ -77,8 +77,6 @@ def add_feed(db, url, title=None):
 
     return feed;
 
-
-# db周り
 def get_entries(db, feed_id=None):
     entries = []
     if feed_id is None:

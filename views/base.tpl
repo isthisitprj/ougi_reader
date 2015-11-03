@@ -27,8 +27,8 @@
                 <li ><a href="./">一覧</a></li>
                 <li class="active"><a href="./add">RSS登録</a></li>
             % else:
-                <li ><a href="../">一覧</a></li>
-                <li ><a href="../add">RSS登録</a></li>
+                <li ><a href="./">一覧</a></li>
+                <li ><a href="./add">RSS登録</a></li>
             % end
             </ul>
         </div>
