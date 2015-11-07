@@ -7,6 +7,14 @@
         <h1 class="page-header">{{title}}の記事一覧</h1>
     % end
 
+    % if errors:
+         <div class="errors">
+         % for error in errors:
+             <p class="text-danger">{{ error }}</p>
+         % end
+         </div>
+     % end
+
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

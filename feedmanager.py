@@ -105,7 +105,7 @@ def update_feed(feed, info=None):
     if info is None:
         info_and_url = _get_info_and_url(feed.url)
         if info_and_url is None:
-            return
+            return [u"%s(%d)を取得できませんでした。" % (feed.title, feed.id)]
 
         info = info_and_url[0]
         feed.url = info_and_url[1]
@@ -121,16 +121,18 @@ def update_feed(feed, info=None):
 
 
 def update_feeds(feeds_list):
+    errors = []
     for feed in feeds_list:
-        import pdb; pdb.set_trace()
         info_and_url = _get_info_and_url(feed.url)
         if info_and_url is None:
             # update_feedにNoneを渡しても、中でよしなにしてくれるけど、
             # 重たい処理なのでこっちでbreakする
+            errors.append(u"%s(%d)の記事を取得できませんでした。" % (feed.title, feed.id))
             break
         info = info_and_url[0]
         feed.url = info_and_url[1]
         update_feed(feed, info)
+    return errors
 
 
 def setup_feed(feed):

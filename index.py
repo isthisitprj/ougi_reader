@@ -50,13 +50,13 @@ def index(db):
 
     # feedの更新
     feeds = models.get_all_feeds(db)
-    feedmanager.update_feeds(feeds)
+    errors = feedmanager.update_feeds(feeds)
 
     # entriesテーブルから全件取得
     entries = models.get_entries(db)
 
     # index.tplの描画
-    return template('index', title=None, entries=entries, request=request)
+    return template('index', title=None, entries=entries, errors=error, request=request)
 
 
 @get('/add')
@@ -100,11 +100,11 @@ def edit(db, feed_id):
         return HTTPError(404, 'Feed is not found.')
 
     # feedの更新
-    feedmanager.update_feed(feed)
+    errors = feedmanager.update_feed(feed)
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画
-    return template('index', title=feed.title, entries=entries, request=request)
+    return template('index', title=feed.title, entries=entries, errors=error, request=request)
 
 
 @get('/<feed_id:int>/edit')
