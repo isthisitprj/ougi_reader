@@ -73,6 +73,8 @@ def add_feed(db, url, title=None):
     )
     # feedを保存
     db.add(feed)
+
+    # idを使いたいので、ここでcommitしておく
     db.commit()
 
     return feed;
@@ -94,3 +96,8 @@ def get_feed(db, feed_id):
 
 def get_all_feeds(db):
     return db.query(Feed).all()
+
+def get_same_url_feed(db, feed_url):
+    # 有無が知りたいので、先頭だけでよい(むしろ複数あるような状態がおかしい)
+    feed = db.query(Feed).filter(Feed.url == feed_url).first()
+    return feed

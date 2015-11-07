@@ -72,24 +72,36 @@ def create(db):
     form = FeedForm(request.forms.decode())
 
     # フォームのバリデーション
-    if form.validate():
-
-        # Feedの生成と格納
-        feed = models.add_feed(db,
-            title=form.title.data,
-            url=form.url.data,
-        )
-
-        feed = feedmanager.setup_feed(feed)
-
-        if feed is None:
-            form.url.errors.append(u"URLからフィードを取得できませんでした。")
-            return template('add', form=form, request=request)
-
-        # 一覧画面へリダイレクト
-        redirect("./" + str(feed.id))
-    else:
+    if not form.validate():
         return template('add', form=form, request=request)
+
+    # Feedの生成と格納
+    feed = models.add_feed(db,
+        title=form.title.data,
+        url=form.url.data,
+    )
+
+    feed = feedmanager.setup_feed(feed)
+
+    if feed is None:
+        form.url.errors.append(u"URLからフィードを取得できませんでした。")
+        return template('add', form=form, request=request)
+
+
+    # feedを既存から検索し、重複していればエラー扱い&コミットしない
+    same_url_feed = models.get_same_url_feed(db, feed.url)
+
+    if same_url_feed is not None:
+        form.url.errors.append(
+            u"すでに同じフィードが登録されています。(「%s」)" % feed.title)
+        # insertしてしまっているので、元に戻す(1行だけなので、modelsにはとりあえず入れないでおく)
+        db.delete(feed)
+        return template('add', form=form, request=request)
+
+
+    # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
+    redirect("./" + str(feed.id))
+
 
 @get('/<feed_id:int>')
 def edit(db, feed_id):
@@ -134,16 +146,17 @@ def update(db, feed_id):
 
     form = FeedForm(request.forms.decode())
 
-    if form.validate():
-        # feed情報を更新
-        feed.title = form.title.data
-        feed.url = form.url.data
-
-        # 一覧画面へリダイレクト
-        # TODO 自分の一覧にリダイレクト
-        redirect("../")
-    else:
+    if not form.validate():
         return template('edit', form=form, request=request)
+
+    # feed情報を更新
+    feed.title = form.title.data
+    feed.url = form.url.data
+
+    # 一覧画面へリダイレクト
+    # TODO 自分の一覧にリダイレクト
+    redirect("../")
+
 
 
 @post('/<feed_id:int>/delete')

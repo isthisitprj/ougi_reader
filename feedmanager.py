@@ -147,5 +147,4 @@ def setup_feed(feed):
         # TODO titleの実態参照が2重がけになり、表示されるときに解消されない
         feed.title = info.feed.title
 
-    update_feed(feed, info)
     return feed
