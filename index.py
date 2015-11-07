@@ -39,7 +39,7 @@ class FeedForm(Form):
         validators.Optional(),
         validators.length(min=1, max=100, message=u"100文字以下で入力してください")
     ])
-    url = StringField(u'url', [
+    url = StringField(u'URL', [
         validators.InputRequired(message=u"入力してください"),
         validators.length(min=1, max=2000, message=u"2000文字以下で入力してください")
     ])
@@ -56,7 +56,7 @@ def index(db):
     entries = models.get_entries(db)
 
     # index.tplの描画
-    return template('index', entries=entries, request=request)
+    return template('index', title=None, entries=entries, request=request)
 
 
 @get('/add')
@@ -72,7 +72,6 @@ def create(db):
     form = FeedForm(request.forms.decode())
 
     # フォームのバリデーション
-    print form.validate()
     if form.validate():
 
         # Feedの生成と格納
@@ -80,8 +79,11 @@ def create(db):
             title=form.title.data,
             url=form.url.data,
         )
+
         feed = feedmanager.setup_feed(feed)
+
         if feed is None:
+            form.url.errors.append(u"URLからフィードを取得できませんでした。")
             return template('add', form=form, request=request)
 
         # 一覧画面へリダイレクト
@@ -102,7 +104,7 @@ def edit(db, feed_id):
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画
-    return template('index', entries=entries, request=request)
+    return template('index', title=feed.title, entries=entries, request=request)
 
 
 @get('/<feed_id:int>/edit')

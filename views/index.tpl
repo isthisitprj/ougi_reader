@@ -1,7 +1,11 @@
 % rebase('base.tpl')
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">記事一覧</h1>
+    % if title is None:
+        <h1 class="page-header">全フィードの記事一覧</h1>
+    % else:
+        <h1 class="page-header">{{title}}の記事一覧</h1>
+    % end
 
     <div class="table-responsive">
         <table class="table table-striped">

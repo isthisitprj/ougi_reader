@@ -14,15 +14,46 @@ def _conv_structtime_to_datetime(struct_time):
 def _sorted_by_pubdate_in_des(entryList):
     return sorted(entryList, key=lambda entry: entry.published_at, reverse=True)
 
+# TODO
+def _get_info_from_attr(url):
+    return None
 
-def _get_info(url):
+def _get_info_and_url(url):
+
     info = feedparser.parse(url)
-    if hasattr(info, "bozo_exception"):
-        exc = info.bozo_exception
-        if isinstance(exc, URLError):
-            return None
+    if not hasattr(info, "bozo_exception"):
+        return (info, url)
 
-    return info
+    exc = info.bozo_exception
+    # if isinstance(exc, URLError):
+    #    return None
+    # return None
+
+    # 与えられたurlがページ自体のものだとみなし、feedurlを取得を試みる
+
+    # htmlのlink属性からのfeedurlを取得を試みる
+    url_from_attr = _get_info_from_attr(url)
+    print url_from_attr
+    info = feedparser.parse(url_from_attr)
+    if not hasattr(info, "bozo_exception"):
+        return (info, url_from_attr)
+
+    exc = info.bozo_exception
+
+    # urlによくあるパターンを当てはめてfeedurlを取得を試みる
+    if url.endswith("/"):
+        url = url[:-1]
+
+    feed_suffixes = ["/feed", ".atom", "/?mode=atom"]
+    url_from_patterns = map(lambda sfx:url + sfx, feed_suffixes)
+    for url_from_pattern in url_from_patterns:
+        print url_from_pattern
+        info = feedparser.parse(url_from_pattern)
+        if not hasattr(info, "bozo_exception"):
+            return (info, url_from_pattern)
+
+    # feedが取得できなかった
+    return None
 
 
 def _get_feed_date(feed):
@@ -72,9 +103,13 @@ def update_entry(info, feed_id):
 
 def update_feed(feed, info=None):
     if info is None:
-        info = _get_info(feed.url)
-        if info is None:
+        info_and_url = _get_info_and_url(feed.url)
+        if info_and_url is None:
             return
+
+        info = info_and_url[0]
+        feed.url = info_and_url[1]
+
 
     newEntries = update_entry(info, feed.id)
     if len(feed.entries) != 0:
@@ -87,16 +122,24 @@ def update_feed(feed, info=None):
 
 def update_feeds(feeds_list):
     for feed in feeds_list:
-        info = _get_info(feed.url)
-        if info is None:
+        import pdb; pdb.set_trace()
+        info_and_url = _get_info_and_url(feed.url)
+        if info_and_url is None:
+            # update_feedにNoneを渡しても、中でよしなにしてくれるけど、
+            # 重たい処理なのでこっちでbreakする
             break
+        info = info_and_url[0]
+        feed.url = info_and_url[1]
         update_feed(feed, info)
 
 
 def setup_feed(feed):
-    info = _get_info(feed.url)
-    if info is None:
+    info_and_url = _get_info_and_url(feed.url)
+    if info_and_url is None:
         return None
+    else:
+        info = info_and_url[0]
+        feed.url = info_and_url[1]
 
     if not feed.title:
         # TODO titleの実態参照が2重がけになり、表示されるときに解消されない
