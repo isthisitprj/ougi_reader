@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import bottle
-from bottle import get, post, run, view
+from bottle import get, post, run #, view
 from bottle import request, template, redirect
 from bottle import HTTPError
-
-from sqlalchemy import create_engine
-
-from bottle.ext import sqlalchemy
 
 from wtforms.form import Form
 from wtforms import validators
@@ -17,21 +12,6 @@ import models
 import feedmanager
 
 
-Base = models.Base
-engine = create_engine('mysql://ougi:ougi_reader0@localhost:3306/ougi_reader?charset=utf8', echo=False)
-
-# bottle-sqlalchemyの設定
-plugin = sqlalchemy.Plugin(
-    engine,
-    Base.metadata,
-    keyword='db',  # 関数内で挿入される場合の変数名
-    create=True,  # テーブルを作成するか
-    commit=True,  # 関数終了時にコミットするか
-    use_kwargs=False
-)
-
-# プラグインのインストール
-bottle.install(plugin)
 
 
 class FeedForm(Form):
