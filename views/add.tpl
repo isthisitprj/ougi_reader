@@ -8,15 +8,30 @@
         <form action="./add" method="post">
 
             <div class="form-group">
-                <label for="title">タイトル</label>
-                <input id="title" name="title" type="text" class="form-control" maxlength="100" placeholder="タイトルを入力">
+                {{ !form.title.label }}
+                {{ !form.title(class_="form-control", placeholder=u"タイトルを入力", maxlength="100") }}
+
+               % if form.title.errors:
+                    <div class="errors">
+                    % for error in form.title.errors:
+                        <p class="text-danger">{{ error }}</p>
+                    % end
+                    </div>
+                % end
             </div>
 
             <div class="form-group">
-                <label for="url">URL</label>
-                <input id="url" name="url" type="text" class="form-control" maxlength="2000" placeholder="URLを入力">
-            </div>
+                {{ !form.url.label }}
+                {{ !form.url(class_="form-control", placeholder=u"URLを入力", maxlength="2000") }}
 
+               % if form.url.errors:
+                    <div class="errors">
+                    % for error in form.url.errors:
+                        <p class="text-danger">{{ error }}</p>
+                    % end
+                    </div>
+                % end
+            </div>
 
             <input type="submit" class="btn btn-default" value="登録する"/>
 
