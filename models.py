@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import Column, Integer, String, Boolean, Unicode, DateTime, UnicodeText, MetaData, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Unicode, DateTime, UnicodeText, MetaData, ForeignKey
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.declarative import declarative_base
 
 from bottle.ext import sqlalchemy
 from bottle import install as bottle_install
 
-from sqlalchemy import create_engine
 # 設定ファイル読み込み用
 import os.path
 import yaml
-
-print "models"
 
 
 CONFIG_FILENAME = "config.yaml"

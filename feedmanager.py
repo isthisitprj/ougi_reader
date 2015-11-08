@@ -33,7 +33,6 @@ def _get_info_and_url(url):
 
     # htmlのlink属性からのfeedurlを取得を試みる
     url_from_attr = _get_info_from_attr(url)
-    print url_from_attr
     info = feedparser.parse(url_from_attr)
     if not hasattr(info, "bozo_exception"):
         return (info, url_from_attr)
@@ -47,7 +46,6 @@ def _get_info_and_url(url):
     feed_suffixes = ["/feed", ".atom", "/?mode=atom"]
     url_from_patterns = map(lambda sfx:url + sfx, feed_suffixes)
     for url_from_pattern in url_from_patterns:
-        print url_from_pattern
         info = feedparser.parse(url_from_pattern)
         if not hasattr(info, "bozo_exception"):
             return (info, url_from_pattern)
@@ -75,16 +73,14 @@ def _check_new_entries(newList, last_updated_at):
     for e in newList:
         newEntryDate = e.published_at
         print "newEntryDate: " + str(newEntryDate)
-        print newEntryDate > last_updated_at
         if newEntryDate > last_updated_at:
             continue
         elif newEntryDate == last_updated_at:
-            # TODO 後で頑張る
+            # TODO 後で頑張る？
             continue
         else:
-            print "index: %d" % newList.index(e)
+            print "* get %d new entries" % newList.index(e)
             entryList = newList[:newList.index(e)]
-            print "break"
             break
 
     return entryList
