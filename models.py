@@ -8,12 +8,39 @@ from bottle.ext import sqlalchemy
 from bottle import install as bottle_install
 
 from sqlalchemy import create_engine
+# 設定ファイル読み込み用
+import os.path
+import yaml
+
+print "models"
+
+
+CONFIG_FILENAME = "config.yaml"
+
+def get_conection_string():
+    config_pass = os.path.join(os.path.dirname(__file__), CONFIG_FILENAME)
+    if os.path.isfile(config_pass):
+        with open(config_pass, 'r') as cf:
+            conf_dic = yaml.load(cf)  # 読み込む
+        if not isinstance(conf_dic, dict):
+            conf_dic = {}
+    else:
+        conf_dic = {}
+
+    username = conf_dic.get("username", "ougi")
+    password = conf_dic.get("password", "ougi_reader0")
+    hostname = conf_dic.get("hostname", "localhost")
+    ip = conf_dic.get("ip", "3306")
+    table = conf_dic.get("table", "ougi_reader")
+
+    return "mysql://%s:%s@%s:%s/%s?charset=utf8" % (username, password, hostname, ip, table)
 
 
 # 初期化処理
 Base = declarative_base()
 
-engine = create_engine('mysql://ougi:ougi_reader0@localhost:3306/ougi_reader?charset=utf8', echo=False)
+engine = create_engine(get_conection_string(), echo=False)
+
 # bottle-sqlalchemyの設定
 plugin = sqlalchemy.Plugin(
     engine,
