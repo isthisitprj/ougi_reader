@@ -23,21 +23,29 @@
             <ul class="nav nav-sidebar">
             % if request.path == "/":
                 <li class="active"><a href="./">一覧</a></li>
-                <li ><a href="./add">RSS登録</a></li>
-            % elif request.path == "/add":
-                <li ><a href="./">一覧</a></li>
-                <li class="active"><a href="./add">RSS登録</a></li>
             % else:
                 <li ><a href="./">一覧</a></li>
-                <li ><a href="./add">RSS登録</a></li>
             % end
+
             % if feeds:
                 <li class="nav-divider"></li>
                 % for feed in feeds:
-                    <li ><a href="./{{feed.id}}">{{feed.title}}</a></li>
+                    % if request.path == "/" + str(feed.id):
+                        <li class="active"><a href="./{{feed.id}}">{{feed.title}}</a></li>
+                    % else:
+                        <li ><a href="./{{feed.id}}">{{feed.title}}</a></li>
+                    % end
                 % end
                 <li class="nav-divider"></li>
             % end
+
+            % if request.path == "/add":
+                <li class="active"><a href="./add">RSS登録</a></li>
+            % else:
+                <li ><a href="./add">RSS登録</a></li>
+            % end
+
+                <li class="nav-divider"></li>
             </ul>
         </div>
 
