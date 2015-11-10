@@ -27,10 +27,17 @@
             <tbody>
             % if entries:
                 % for entry in entries:
-                <tr>
+                <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
                     <td>{{entry.feed.title}}</td>
                     <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
                     <td>{{entry.published_at}}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="hidden-row">
+                        <div id="{{entry.id}}" class="collapse">
+                            <p class="summary">{{entry.description}}</p>
+                        </div>
+                    </td>
                 </tr>
                 % end
             % end

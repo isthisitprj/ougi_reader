@@ -91,6 +91,8 @@ def update_entry(info, feed_id):
     for e in info.entries:
         if e.description is not None:
             description = e.description[:200]
+            if len(description) == 200:
+                description = description[:199] + u"…";
         else:
             description = e.sammary
         entryList.append(Entry(e.title,  _conv_structtime_to_datetime(e.published_parsed), feed_id, e.link, description))
