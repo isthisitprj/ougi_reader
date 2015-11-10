@@ -15,22 +15,20 @@
 
     <style type="text/css">
 
-        body {
-            padding-top: 50px;
+        /* header */
+        .page-header {
+            margin-top: 0;
         }
 
         .navbar-fixed-top {
             border: 0;
         }
 
-        .main {
-            padding: 15px;
+        body {
+            padding-top: 50px;
         }
 
-        .main .page-header {
-            margin-top: 0;
-        }
-
+        /* sidebar */
         .sidebar {
             position: fixed;
             display: block;
@@ -55,6 +53,12 @@
         .nav-sidebar > .active > a:hover {
             color: #eee;
             background-color: #428bca;
+        }
+
+        /* main */
+        .main {
+            padding: 15px;
+            margin-top: 0;
         }
 
     </style>
