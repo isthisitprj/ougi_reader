@@ -29,6 +29,7 @@
         }
 
         /* sidebar */
+
         .sidebar {
             position: fixed;
             display: block;
@@ -59,6 +60,14 @@
         .main {
             padding: 15px;
             margin-top: 0;
+        }
+
+        .hidden-row {
+            padding: 0px !important;
+        }
+
+        .summary {
+            padding: 20px 100px;
         }
 
     </style>
