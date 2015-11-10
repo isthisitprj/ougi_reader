@@ -11,7 +11,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">おうぎリーダー(てすと)</a>
+            <a class="navbar-brand" href="./">おうぎリーダー(てすと)</a>
         </div>
     </div>
 </nav>
@@ -19,33 +19,52 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-
+                <!-- <li class="btn"> -->
+                    % if request.path == "/add":
+                        % add_status = "active"
+                    % else:
+                        % add_status = ""
+                    % end
+                    <a href="./add" type="button" class="btn btn-primary navbar-btn btn-block {{add_status}}" role="button">
+                        <span class="glyphicon glyphicon-plus"></span> フィード登録
+                    </a>
+                <!-- </li> -->
             <ul class="nav nav-sidebar">
+                <!-- not yet impl favorite -->
+                <li class="disabled">
+                    % if request.path == "/fav":
+                        % fav_status = "active"
+                    % else:
+                        % fav_status = ""
+                    % end
+                    <a class="{{fav_status}}">
+                        <span class="glyphicon glyphicon-bookmark"></span> Favorite
+                    </a>
+                </li>
+
             % if request.path == "/":
-                <li class="active"><a href="./">一覧</a></li>
+                % all_status = "active"
             % else:
-                <li ><a href="./">一覧</a></li>
+                % all_status = ""
             % end
+                <li class="{{all_status}}">
+                    <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All</a>
+                </li>
+
 
             % if feeds:
                 <li class="nav-divider"></li>
                 % for feed in feeds:
                     % if request.path == "/" + str(feed.id):
-                        <li class="active"><a href="./{{feed.id}}">{{feed.title}}</a></li>
+                        % feed_status = "active"
                     % else:
-                        <li ><a href="./{{feed.id}}">{{feed.title}}</a></li>
+                        % feed_status = ""
                     % end
+                        <li class="{{feed_status}}">
+                            <a href="./{{feed.id}}">{{feed.title}}</a>
+                        </li>
                 % end
-                <li class="nav-divider"></li>
             % end
-
-            % if request.path == "/add":
-                <li class="active"><a href="./add">RSS登録</a></li>
-            % else:
-                <li ><a href="./add">RSS登録</a></li>
-            % end
-
-                <li class="nav-divider"></li>
             </ul>
         </div>
 

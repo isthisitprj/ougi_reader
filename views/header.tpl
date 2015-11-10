@@ -56,6 +56,14 @@
             background-color: #428bca;
         }
 
+        .nav-sidebar > .btn {
+            padding-bottom: 20px;
+        }
+
+        .icon-right {
+            padding-right: 10px;
+        }
+
         /* main */
         .main {
             padding: 15px;
