@@ -1,4 +1,4 @@
-% rebase('base.tpl')
+% rebase('base.tpl', feeds=feeds)
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     % if title is None:
@@ -25,13 +25,14 @@
             </tr>
             </thead>
             <tbody>
-
-            % for entry in entries:
-            <tr>
-                <td>{{entry.feed.title}}</td>
-                <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
-                <td>{{entry.published_at}}</td>
-            </tr>
+            % if entries:
+                % for entry in entries:
+                <tr>
+                    <td>{{entry.feed.title}}</td>
+                    <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
+                    <td>{{entry.published_at}}</td>
+                </tr>
+                % end
             % end
             </tbody>
         </table>
