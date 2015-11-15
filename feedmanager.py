@@ -14,6 +14,10 @@ import feedparser
 
 from models import Entry
 
+# when entry doesn't have sammary
+MAX_DESCRIPTION_LENGTH = 500
+
+MAX_SAMMARY_LENGTH = 2000
 
 def _conv_structtime_to_datetime(struct_time):
     """convert struct_time to datetime (second precision) for storing in DB."""
@@ -149,11 +153,13 @@ def _get_now_entries(info, feed_id):
     for e in info.entries:
         # descriptionがあるならRSS、ないならAtom
         if e.description is not None:
-            description = e.description[:200]
-            if len(description) == 200:
-                description = description[:199] + u"…"
+            description = e.description
+            if MAX_DESCRIPTION_LENGTH < len(description):
+                description = description[:MAX_DESCRIPTION_LENGTH] + u"…"
         else:
             description = e.sammary
+            if MAX_SAMMARY_LENGTH < len(description):
+                description = description[:MAX_SAMMARY_LENGTH] + u"…"
         entryList.append(Entry(e.title,  _conv_structtime_to_datetime(
             e.published_parsed), feed_id, e.link, description))
     return entryList
