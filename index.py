@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from bottle import get, post, run #, view
-from bottle import request, template, redirect
-from bottle import HTTPError
 
+from bottle import HTTPError, get, post, redirect, request, run, template
+from wtforms import IntegerField, StringField, TextAreaField, validators
 from wtforms.form import Form
-from wtforms import validators
-from wtforms import StringField, IntegerField, TextAreaField
 
-import models
+
 import feedmanager
-
-
+import models
 
 
 class FeedForm(Form):
@@ -60,16 +56,15 @@ def create(db):
 
     # Feedの生成と格納
     feed = models.add_feed(db,
-        title=form.title.data,
-        url=form.url.data,
-    )
+                           title=form.title.data,
+                           url=form.url.data,
+                           )
 
     feed = feedmanager.setup_feed(feed)
 
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
         return template('add', feeds=feeds, form=form, request=request)
-
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
     same_url_feed = models.get_same_url_feed(db, feed.url)
@@ -80,7 +75,6 @@ def create(db):
         # insertしてしまっているので、元に戻す(1行だけなので、modelsにはとりあえず入れないでおく)
         db.delete(feed)
         return template('add', feeds=feeds, form=form, request=request)
-
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
     redirect("./" + str(feed.id))
@@ -145,7 +139,6 @@ def update(db, feed_id):
     # 一覧画面へリダイレクト
     # TODO 自分の一覧にリダイレクト
     redirect("../")
-
 
 
 @post('/<feed_id:int>/delete')

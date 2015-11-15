@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Unicode, DateTime, UnicodeText, MetaData, ForeignKey
-from sqlalchemy.orm import relation, backref
-from sqlalchemy.ext.declarative import declarative_base
-
-from bottle.ext import sqlalchemy
-from bottle import install as bottle_install
-
 # 設定ファイル読み込み用
 import os.path
+
 import yaml
+from bottle import install as bottle_install
+from bottle.ext import sqlalchemy
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
+                        MetaData, String, Unicode, UnicodeText, create_engine)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref, relation
 
 
 CONFIG_FILENAME = "config.yaml"
+
 
 def get_conection_string():
     config_pass = os.path.join(os.path.dirname(__file__), CONFIG_FILENAME)
@@ -63,12 +64,11 @@ class Feed(Base):
     last_updated_at = Column(DateTime)
     published_at = Column(DateTime)
 
-
     def __init__(self,  url, title=None, published_at=None, last_updated_at=None):
-       self.title = title
-       self.url = url
-       self.published_at = published_at
-       self.last_updated_at = last_updated_at
+        self.title = title
+        self.url = url
+        self.published_at = published_at
+        self.last_updated_at = last_updated_at
 
     def __repr__(self):
         return "<Feed('%s', '%s', '%s', '%s', '%d')>" % (
@@ -77,7 +77,8 @@ class Feed(Base):
             self.published_at,
             self.last_updated_at,
             len(self.entries)
-            )
+        )
+
 
 class Entry(Base):
     __tablename__ = 'entries'
@@ -93,7 +94,7 @@ class Entry(Base):
     description = Column(Unicode(2000))
 
     feed = relation(Feed, backref=backref('entries', order_by=id),
-        cascade="all, delete, delete-orphan", single_parent=True )
+                    cascade="all, delete, delete-orphan", single_parent=True)
 
     def __init__(self, title, published_at, feed_id, url, description, read=False, read_at=None):
         self.title = title
@@ -121,25 +122,30 @@ def add_feed(db, url, title=None):
     # idを使いたいので、ここでcommitしておく
     db.commit()
 
-    return feed;
+    return feed
+
 
 def get_entries(db, feed_id=None):
     entries = []
     if feed_id is None:
         entries = db.query(Entry).order_by("published_at").all()
     else:
-        entries = db.query(Entry).filter(Entry.feed_id == feed_id).order_by("published_at").all()
+        entries = db.query(Entry).filter(
+            Entry.feed_id == feed_id).order_by("published_at").all()
 
     if entries is not None:
         return reversed(entries)
     else:
         return None
 
+
 def get_feed(db, feed_id):
     return db.query(Feed).get(feed_id)
 
+
 def get_all_feeds(db):
     return db.query(Feed).all()
+
 
 def get_same_url_feed(db, feed_url):
     # 有無が知りたいので、先頭だけでよい(むしろ複数あるような状態がおかしい)

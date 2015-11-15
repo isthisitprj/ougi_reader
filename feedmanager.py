@@ -1,22 +1,29 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import feedparser
 from urllib2 import URLError
+
+import feedparser
 
 from models import Entry
 
-# 日付変換
+
 def _conv_structtime_to_datetime(struct_time):
+    '''日付変換
+    '''
     return datetime(*struct_time[:6])
 
-# Entryのソート
+
 def _sorted_by_pubdate_in_des(entryList):
+    '''Entryのソート
+    '''
     return sorted(entryList, key=lambda entry: entry.published_at, reverse=True)
 
-# TODO
+
 def _get_info_from_attr(url):
+    # TODO
     return None
+
 
 def _get_info_and_url(url):
 
@@ -44,8 +51,8 @@ def _get_info_and_url(url):
         url = url[:-1]
 
     feed_suffixes = ["/feed", ".atom", "/?mode=atom"]
-    url_from_patterns = map(lambda sfx:url + sfx, feed_suffixes)
-    for url_from_pattern in url_from_patterns:
+    for suffix in feed_suffixes:
+        url_from_pattern = url + suffix
         info = feedparser.parse(url_from_pattern)
         if not hasattr(info, "bozo_exception"):
             return (info, url_from_pattern)
@@ -55,9 +62,9 @@ def _get_info_and_url(url):
 
 
 def _get_feed_date(feed):
-    if hasattr(feed, 'published_parsed'): # RSSのfeedの場合
+    if hasattr(feed, 'published_parsed'):  # RSSのfeedの場合
         return _conv_structtime_to_datetime(feed.published_parsed)
-    elif hasattr(feed, 'updated_parsed'): # Atomのfeedの場合
+    elif hasattr(feed, 'updated_parsed'):  # Atomのfeedの場合
         return _conv_structtime_to_datetime(feed.updated_parsed)
     else:
         return None
@@ -92,10 +99,11 @@ def update_entry(info, feed_id):
         if e.description is not None:
             description = e.description[:200]
             if len(description) == 200:
-                description = description[:199] + u"…";
+                description = description[:199] + u"…"
         else:
             description = e.sammary
-        entryList.append(Entry(e.title,  _conv_structtime_to_datetime(e.published_parsed), feed_id, e.link, description))
+        entryList.append(Entry(e.title,  _conv_structtime_to_datetime(
+            e.published_parsed), feed_id, e.link, description))
     return entryList
 
 
@@ -108,10 +116,10 @@ def update_feed(feed, info=None):
         info = info_and_url[0]
         feed.url = info_and_url[1]
 
-
     newEntries = update_entry(info, feed.id)
-    if len(feed.entries) != 0:
-        newEntries = _check_new_entries(_sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
+    if not feed.entries:
+        newEntries = _check_new_entries(
+            _sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
     feed.entries.extend(newEntries)
 
     feed.published_at = _get_feed_date(info.feed)
