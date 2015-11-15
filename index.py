@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-
+"""index - routing for ougi reader."""
 
 from bottle import HTTPError, get, post, redirect, request, run, template
-from wtforms import IntegerField, StringField, TextAreaField, validators
-from wtforms.form import Form
 
+from wtforms import StringField, validators
+from wtforms.form import Form
 
 import feedmanager
 import models
 
 
 class FeedForm(Form):
+
+    """Form for add feed page (maybe and edit feedpage)."""
+
     title = StringField(u'タイトル', [
         validators.Optional(),
         validators.length(min=1, max=100, message=u"100文字以下で入力してください")
@@ -32,7 +35,8 @@ def index(db):
     entries = models.get_entries(db)
 
     # index.tplの描画
-    return template('index', feeds=feeds, title=None, entries=entries, errors=errors, request=request)
+    return template('index', feeds=feeds, title=None, entries=entries,
+                    errors=errors, request=request)
 
 
 @get('/add')
@@ -81,7 +85,7 @@ def create(db):
 
 
 @get('/<feed_id:int>')
-def edit(db, feed_id):
+def show_entry_list(db, feed_id):
     feeds = models.get_all_feeds(db)
 
     # Feedの検索
@@ -95,7 +99,8 @@ def edit(db, feed_id):
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画
-    return template('index', feeds=feeds, title=feed.title, entries=entries, errors=errors, request=request)
+    return template('index', feeds=feeds, title=feed.title, entries=entries,
+                    errors=errors, request=request)
 
 
 @get('/<feed_id:int>/edit')
@@ -143,7 +148,6 @@ def update(db, feed_id):
 
 @post('/<feed_id:int>/delete')
 def destroy(db, feed_id):
-    feeds = models.get_all_feeds(db)
 
     # Feedの検索
     feed = models.get_feed(db, feed_id)

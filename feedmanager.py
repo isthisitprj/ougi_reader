@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 
+"""feedmanager - treat feeds and its entries.
+
+* create feeds and entries
+* update entries of feeds
+* check and find feeds URL
+"""
+
 from datetime import datetime
-from urllib2 import URLError
+# from urllib2 import URLError
 
 import feedparser
 
@@ -9,29 +16,53 @@ from models import Entry
 
 
 def _conv_structtime_to_datetime(struct_time):
-    '''日付変換
-    '''
+    """convert struct_time to datetime (second precision) for storing in DB."""
+    # struct_time[5] is second
     return datetime(*struct_time[:6])
 
 
 def _sorted_by_pubdate_in_des(entryList):
-    '''Entryのソート
-    '''
-    return sorted(entryList, key=lambda entry: entry.published_at, reverse=True)
+    """sort entries list by published_at in descending order.
+
+    :rtype:     list of entries
+    :return:    sorted list
+    """
+    return sorted(entryList, key=lambda entry: entry.published_at,
+                  reverse=True)
 
 
 def _get_info_from_attr(url):
+    """*not yet impl* get feed info by searching feed URL in html.
+
+    :rtype:     String
+    :return:    feed URL
+
+    Usually, feed URL is described in link tag
+    with 'rel="alternate" type="application/rss+xml"' or
+    'rel="alternate" type="application/atom+xml"'.
+    And sometimes there are several feed URL.
+    """
     # TODO
     return None
 
 
 def _get_info_and_url(url):
+    """get feed info and URL in taple (info, url).
 
+    :rtype:     (info, url)
+    :return:    feed info and feed URL
+
+    use several below strategy for getting feed URL.
+    * use plain param
+    * *not yet impl* search link tag in html rerurned by plain param
+    * try some patterns URL suffixes
+    """
     info = feedparser.parse(url)
     if not hasattr(info, "bozo_exception"):
         return (info, url)
 
-    exc = info.bozo_exception
+    # exc = info.bozo_exception
+    # 本当は、エラーの種類ごとに細かくチェックしたいが、、、
     # if isinstance(exc, URLError):
     #    return None
     # return None
@@ -44,7 +75,7 @@ def _get_info_and_url(url):
     if not hasattr(info, "bozo_exception"):
         return (info, url_from_attr)
 
-    exc = info.bozo_exception
+    # exc = info.bozo_exception
 
     # urlによくあるパターンを当てはめてfeedurlを取得を試みる
     if url.endswith("/"):
@@ -62,6 +93,16 @@ def _get_info_and_url(url):
 
 
 def _get_feed_date(feed):
+    """get date as feed.published_at.
+
+    :rtype:     datetime
+    :return:    date as feed.published_at
+
+    If feed is RSS feed, it hasn't updated_parsed.
+    So return published_parsed.
+    And if feed is Atom feed, it hasn't published_parsed.
+    So returnupdated_parsed.
+    """
     if hasattr(feed, 'published_parsed'):  # RSSのfeedの場合
         return _conv_structtime_to_datetime(feed.published_parsed)
     elif hasattr(feed, 'updated_parsed'):  # Atomのfeedの場合
@@ -70,7 +111,12 @@ def _get_feed_date(feed):
         return None
 
 
-def _check_new_entries(newList, last_updated_at):
+def _filter_new_entries(newList, last_updated_at):
+    """filter out already geted entries from param.
+
+    :rtype:     entry list
+    :return:    list or entries added after this module updated last
+    """
     if last_updated_at is None:
         return newList
 
@@ -93,9 +139,15 @@ def _check_new_entries(newList, last_updated_at):
     return entryList
 
 
-def update_entry(info, feed_id):
+def _get_now_entries(info, feed_id):
+    """create new entries from feed info.
+
+    :rtype:     entry list
+    :return:    list or all entries published now
+    """
     entryList = []
     for e in info.entries:
+        # descriptionがあるならRSS、ないならAtom
         if e.description is not None:
             description = e.description[:200]
             if len(description) == 200:
@@ -108,6 +160,11 @@ def update_entry(info, feed_id):
 
 
 def update_feed(feed, info=None):
+    """add new feed's entries and update published_at and last_updated_at.
+
+    :rtype:     error list
+    :return:    list of error occured in updating
+    """
     if info is None:
         info_and_url = _get_info_and_url(feed.url)
         if info_and_url is None:
@@ -116,9 +173,9 @@ def update_feed(feed, info=None):
         info = info_and_url[0]
         feed.url = info_and_url[1]
 
-    newEntries = update_entry(info, feed.id)
+    newEntries = _get_now_entries(info, feed.id)
     if not feed.entries:
-        newEntries = _check_new_entries(
+        newEntries = _filter_new_entries(
             _sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
     feed.entries.extend(newEntries)
 
@@ -127,6 +184,11 @@ def update_feed(feed, info=None):
 
 
 def update_feeds(feeds_list):
+    """update several feeds.
+
+    :rtype:     error list
+    :return:    list of error occured in updating
+    """
     errors = []
     for feed in feeds_list:
         info_and_url = _get_info_and_url(feed.url)
@@ -142,6 +204,14 @@ def update_feeds(feeds_list):
 
 
 def setup_feed(feed):
+    """validate feed URL and title.
+
+    :rtype:     Feed or None
+    :return:    Feed validated its URL or None
+
+    If given feed URL is invalid, try getting feed URL by several stategy.
+    If given feed title is None, try getting in feed info.
+    """
     info_and_url = _get_info_and_url(feed.url)
     if info_and_url is None:
         return None
