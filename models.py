@@ -160,6 +160,9 @@ class Entry(Base):
                                               self.feed_id)
 
 
+def rollback(db):
+    db.rollback()
+
 def add_feed(db, url, title=None):
     """create Feed object and add and commit it to DB (to make id abalable).
 

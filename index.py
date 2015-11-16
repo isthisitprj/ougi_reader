@@ -116,7 +116,7 @@ def edit(db, feed_id):
 
     # edit.tplを描画
     return template("edit", feeds=models.get_all_feeds(db),
-                    feed=feed, form=form, request=request)
+                    feed_id=feed_id, form=form, request=request)
 
 
 @post("/<feed_id:int>/edit")
@@ -130,17 +130,35 @@ def update(db, feed_id):
 
     form = FeedForm(request.forms.decode())
 
+    # フォームのバリデーション
     if not form.validate():
         return template("edit", feeds=models.get_all_feeds(db),
-                        form=form, request=request)
+                        feed_id=feed_id, form=form, request=request)
 
     # feed情報を更新
     feed.title = form.title.data
     feed.url = form.url.data
 
-    # 一覧画面へリダイレクト
-    # TODO 自分の一覧にリダイレクト
-    redirect("../")
+    feed = feedmanager.setup_feed(feed)
+
+    if feed is None:
+        form.url.errors.append(u"URLからフィードを取得できませんでした。")
+        return template("edit", feeds=models.get_all_feeds(db),
+                        feed_id=feed_id, form=form, request=request)
+
+    # feedを既存から検索し、重複していればエラー扱い&コミットしない
+    same_url_feed = feed.get_another_feed_with_same_url(db)
+
+    if same_url_feed:
+        form.url.errors.append(
+            u"すでに同じフィードが登録されています。(「%s」)" % same_url_feed.title)
+        # addのときと違い、コミットまでははしていない
+        models.rollback(db)
+        return template("edit", feeds=models.get_all_feeds(db),
+                        feed_id=feed_id, form=form, request=request)
+
+    # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
+    redirect("/" + str(feed.id))
 
 
 @post("/<feed_id:int>/delete")
