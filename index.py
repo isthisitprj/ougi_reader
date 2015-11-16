@@ -39,6 +39,25 @@ def index(db):
                     errors=errors, request=request)
 
 
+@get('/<feed_id:int>')
+def show_entry_list(db, feed_id):
+    feeds = models.get_all_feeds(db)
+
+    # Feedの検索
+    feed = models.get_feed(db, feed_id)
+    # Feedが存在しない(404を表示）
+    if not feed:
+        return HTTPError(404, 'Feed is not found.')
+
+    # feedの更新
+    errors = feedmanager.update_feed(feed)
+    entries = models.get_entries(db, feed_id)
+
+    # index.tplの描画
+    return template('index', feeds=feeds, title=feed.title, entries=entries,
+                    errors=errors, request=request)
+
+
 @get('/add')
 def new(db):
     feeds = models.get_all_feeds(db)
@@ -82,25 +101,6 @@ def create(db):
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
     redirect("./" + str(feed.id))
-
-
-@get('/<feed_id:int>')
-def show_entry_list(db, feed_id):
-    feeds = models.get_all_feeds(db)
-
-    # Feedの検索
-    feed = models.get_feed(db, feed_id)
-    # Feedが存在しない(404を表示）
-    if not feed:
-        return HTTPError(404, 'Feed is not found.')
-
-    # feedの更新
-    errors = feedmanager.update_feed(feed)
-    entries = models.get_entries(db, feed_id)
-
-    # index.tplの描画
-    return template('index', feeds=feeds, title=feed.title, entries=entries,
-                    errors=errors, request=request)
 
 
 @get('/<feed_id:int>/edit')
