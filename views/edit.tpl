@@ -13,7 +13,7 @@
         % if request.path == "/add":
             <form action="./add" method="post">
         % else:
-            <form action="../{{feed.id}}/edit" method="post">
+            <form action="../{{feed_id}}/edit" method="post">
         % end
 
         <div class="form-group">
