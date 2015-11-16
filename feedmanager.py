@@ -180,7 +180,7 @@ def update_feed(feed, info=None):
         feed.url = info_and_url[1]
 
     newEntries = _get_now_entries(info, feed.id)
-    if not feed.entries:
+    if feed.entries:
         newEntries = _filter_new_entries(
             _sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
     feed.entries.extend(newEntries)
