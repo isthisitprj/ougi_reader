@@ -35,7 +35,7 @@
                 <tr>
                     <td colspan="3" class="hidden-row">
                         <div id="{{entry.id}}" class="collapse">
-                            <p class="summary">{{entry.description}}</p>
+                            <p class="description">{{entry.description}}</p>
                         </div>
                     </td>
                 </tr>
@@ -44,4 +44,15 @@
             </tbody>
         </table>
     </div>
+
+    <div class="pagination-layout">
+        <ul class="pagination pagination-lg">
+            <li class="prev"><a>Prev</a></li>
+            <li class="active"><a>1</a></li>
+            <li><a>2</a></li>
+            <li><a>3</a></li>
+            <li><a>...</a></li>
+            <li class="next"><a>Next</a></li>
+        </ul>
+   </div>
 </div>

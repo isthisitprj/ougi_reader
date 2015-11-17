@@ -29,7 +29,6 @@
         }
 
         /* sidebar */
-
         .sidebar {
             position: fixed;
             display: block;
@@ -74,8 +73,13 @@
             padding: 0px !important;
         }
 
-        .summary {
-            padding: 20px 100px;
+        .description {
+            padding: 20px 25%;
+        }
+
+        .pagination-layout {
+            width: 100%;
+            text-align: center;
         }
 
     </style>
