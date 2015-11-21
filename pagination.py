@@ -23,7 +23,7 @@ class Pagination(object):
         return self.page < self.pages
 
     def iter_pages(self, left_edge=2, left_current=2,
-                   right_current=5, right_edge=2):
+                   right_current=4, right_edge=2):
         last = 0
         for num in xrange(1, self.pages + 1):
             if num <= left_edge or \
