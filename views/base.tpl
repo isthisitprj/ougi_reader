@@ -25,7 +25,7 @@
                     % else:
                         % add_status = ""
                     % end
-                    <a href="/add" type="button" class="btn btn-primary navbar-btn btn-block {{add_status}}" role="button">
+                    <a href="./add" type="button" class="btn btn-primary navbar-btn btn-block {{add_status}}" role="button">
                         <span class="glyphicon glyphicon-plus"></span> フィード登録
                     </a>
                 <!-- </li> -->
@@ -40,7 +40,7 @@
                         % fav_status = ""
                     % end
                     <li class="{{fav_status}}">
-                        <a href="/fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite <span class="badge">10</span></a>
+                        <a href="./fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite <span class="badge">10</span></a>
                     </li>
                 </li>
 
@@ -52,7 +52,7 @@
                 % all_status = ""
             % end
             <li class="{{all_status}}">
-                <a href="/"><span class="glyphicon glyphicon-list-alt"></span> All <span class="badge">10</span></a>
+                <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All <span class="badge">10</span></a>
             </li>
 
 
@@ -67,7 +67,7 @@
                         % feed_status = ""
                     % end
                     <li class="{{feed_status}}">
-                        <a href="/{{feed.id}}">{{feed.title}} <span class="badge">10</span></a>
+                        <a href="./{{feed.id}}">{{feed.title}} <span class="badge">10</span></a>
                     </li>
                 % end
             % end
