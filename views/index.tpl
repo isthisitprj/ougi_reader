@@ -5,6 +5,9 @@
         <h1 class="page-header">全フィードの記事一覧</h1>
     % else:
         <h1 class="page-header">{{title}}の記事一覧</h1>
+        <div class="row">
+            <a href="./edit" type="button" class="btn btn-sm btn-default pull-right btn-edit" role="button">フィード編集</a>
+        </div>
     % end
 
     % if errors:
@@ -27,15 +30,24 @@
             <tbody>
             % if entries:
                 % for entry in entries:
-                <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % if entry is None:
+                    <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % else:
+                    <tr class="clickable active" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % end
+
                     <td>{{entry.feed.title}}</td>
+                    % if entry is None:
                     <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
+                    % else:
+                    <td class="bold"><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
+                    % end
                     <td>{{entry.published_at}}</td>
                 </tr>
                 <tr>
                     <td colspan="3" class="hidden-row">
                         <div id="{{entry.id}}" class="collapse">
-                            <p class="summary">{{entry.description}}</p>
+                            <p class="description">{{entry.description}}</p>
                         </div>
                     </td>
                 </tr>
@@ -44,4 +56,15 @@
             </tbody>
         </table>
     </div>
+
+    <div class="pagination-layout">
+        <ul class="pagination pagination-lg">
+            <li class="prev"><a>Prev</a></li>
+            <li class="active"><a>1</a></li>
+            <li><a>2</a></li>
+            <li><a>3</a></li>
+            <li><a>...</a></li>
+            <li class="next"><a>Next</a></li>
+        </ul>
+   </div>
 </div>

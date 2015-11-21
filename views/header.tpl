@@ -29,7 +29,6 @@
         }
 
         /* sidebar */
-
         .sidebar {
             position: fixed;
             display: block;
@@ -60,8 +59,8 @@
             padding-bottom: 20px;
         }
 
-        .icon-right {
-            padding-right: 10px;
+        .nav-sidebar .unread {
+            font-weight: bold;
         }
 
         /* main */
@@ -74,8 +73,23 @@
             padding: 0px !important;
         }
 
-        .summary {
-            padding: 20px 100px;
+        .description {
+            padding: 20px 25%;
+        }
+
+        .pagination-layout {
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-edit {
+            margin-right: 15px;
+        }
+
+        /* font-style */
+
+        .bold {
+            font-weight: bold;
         }
 
     </style>

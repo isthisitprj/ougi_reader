@@ -32,37 +32,43 @@
             <ul class="nav nav-sidebar">
                 <!-- not yet impl favorite -->
                 <li class="disabled">
-                    % if request.path == "/fav":
-                        % fav_status = "active"
+                    % if request.path == "/fav" and request is not None:
+                        % fav_status = "active bold"
+                    % elif request is not None:
+                        % fav_status = "bold"
                     % else:
                         % fav_status = ""
                     % end
-                    <a class="{{fav_status}}">
-                        <span class="glyphicon glyphicon-bookmark"></span> Favorite
-                    </a>
+                    <li class="{{fav_status}}">
+                        <a href="./fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite <span class="badge">10</span></a>
+                    </li>
                 </li>
 
-            % if request.path == "/":
-                % all_status = "active"
+            % if request.path == "/" and request is not None:
+                % all_status = "active bold"
+            % elif request is not None:
+                % all_status = "bold"
             % else:
                 % all_status = ""
             % end
-                <li class="{{all_status}}">
-                    <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All</a>
-                </li>
+            <li class="{{all_status}}">
+                <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All <span class="badge">10</span></a>
+            </li>
 
 
             % if feeds:
                 <li class="nav-divider"></li>
                 % for feed in feeds:
-                    % if request.path == "/" + str(feed.id):
-                        % feed_status = "active"
+                    % if request.path == "/" + str(feed.id) and feed is not None:
+                        % feed_status = "active bold"
+                    % elif feed is not None:
+                        % feed_status = "bold"
                     % else:
                         % feed_status = ""
                     % end
-                        <li class="{{feed_status}}">
-                            <a href="./{{feed.id}}">{{feed.title}}</a>
-                        </li>
+                    <li class="{{feed_status}}">
+                        <a href="./{{feed.id}}">{{feed.title}} <span class="badge">10</span></a>
+                    </li>
                 % end
             % end
             </ul>
