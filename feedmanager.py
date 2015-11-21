@@ -165,6 +165,14 @@ def _get_now_entries(info, feed_id):
             _get_published_date(e), feed_id, e.link, description))
     return entryList
 
+def _make_old_entries_read(feed):
+    entries = reversed(feed.entries)
+    for entry in entries:
+        if not entry.read:
+            entry.read = True
+        else:
+            break
+
 
 def update_feed(feed, info=None):
     """add new feed's entries and update published_at and last_updated_at.
@@ -172,6 +180,9 @@ def update_feed(feed, info=None):
     :rtype:     error list
     :return:    list of error occured in updating
     """
+    # 既読処理(暫定)
+    _make_old_entries_read(feed)
+
     if info is None:
         info_and_url = _get_info_and_url(feed.url)
         if info_and_url is None:
@@ -203,6 +214,8 @@ def update_feeds(feeds_list):
             # update_feedにNoneを渡しても、中でよしなにしてくれるけど、
             # 重たい処理なのでこっちでbreakする
             errors.append(u"%s(%d)の記事を取得できませんでした。" % (feed.title, feed.id))
+            # 既読処理(暫定)
+            _make_old_entries_read(feed)
             continue
         info = info_and_url[0]
         feed.url = info_and_url[1]
