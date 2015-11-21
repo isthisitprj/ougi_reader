@@ -133,15 +133,17 @@ class Entry(Base):
     title = Column(Unicode(100), nullable=False)
     published_at = Column(DateTime)
     # ...
-    feed_id = Column(Integer, ForeignKey("feeds.id"))
+    feed_id = Column(Integer, ForeignKey("feeds.id", onupdate="CASCADE",
+                                         ondelete="CASCADE"),
+                    nullable=False)
 
     read = Column(Boolean, default=False)
     read_at = Column(DateTime)
     url = Column(String(2000), nullable=False)
     description = Column(Unicode(2000))
 
-    feed = relation(Feed, backref=backref("entries", order_by=id),
-                    cascade="all, delete, delete-orphan", single_parent=True)
+    feed = relation(Feed, backref=backref("entries", order_by=id,
+                                          cascade="all, delete, delete-orphan", single_parent=True))
 
     def __init__(self, title, published_at, feed_id, url, description,
                  read=False, read_at=None):
