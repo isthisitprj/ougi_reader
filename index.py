@@ -172,10 +172,10 @@ def destroy(db, feed_id):
         return HTTPError(404, "Feed is not found.")
 
     # feedを削除
-    db.delete(feed)
+    feed.delete(db)
 
     # 一覧画面へリダイレクト
-    redirect("../")
+    redirect("/")
 
 
 if __name__ == "__main__":
