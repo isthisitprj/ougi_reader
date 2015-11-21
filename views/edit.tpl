@@ -1,11 +1,10 @@
 % rebase('base.tpl', feeds=feeds)
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-
     % if request.path == "/add":
-        <h1 class="page-header">登録</h1>
+        <h1 class="page-header">RSS登録</h1>
     % else:
-        <h1 class="page-header">編集</h1>
+        <h1 class="page-header">RSS編集</h1>
     % end
 
     <div class="col-md-5">
@@ -27,35 +26,19 @@
                 % end
                 </div>
             % end
-
         </div>
 
         <div class="form-group">
-            {{ !form.price.label }}
-            {{ !form.price(class_="form-control", placeholder=u"価格を入力", maxlength="100") }}
+            {{ !form.url.label }}
+            {{ !form.url(class_="form-control", placeholder=u"URLを入力", maxlength="2000") }}
 
-           % if form.price.errors:
+           % if form.url.errors:
                 <div class="errors">
-                % for error in form.price.errors:
+                % for error in form.url.errors:
                     <p class="text-danger">{{ error }}</p>
                 % end
                 </div>
             % end
-
-        </div>
-
-        <div class="form-group">
-            {{ !form.memo.label }}
-            {{ !form.memo(class_="form-control", placeholder=u"価格を入力", maxlength=u"100") }}
-
-           % if form.memo.errors:
-                <div class="errors">
-                % for error in form.memo.errors:
-                    <p class="text-danger">{{ error }}</p>
-                % end
-                </div>
-            % end
-
         </div>
 
         % if request.path == "/add":
