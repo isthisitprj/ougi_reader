@@ -8,6 +8,8 @@ from wtforms.form import Form
 
 import feedmanager
 import models
+import viewutils
+from pagination import Pagination
 
 
 class FeedForm(Form):
@@ -28,15 +30,29 @@ class FeedForm(Form):
 def index(db):
     feeds = models.get_all_feeds(db)
 
+    # パラメータから表示するページ数を取得
+    shown_page = request.params.get(key="page", default=1, type=int)
+
     # feedの更新
     errors = feedmanager.update_feeds(feeds)
 
     # entriesテーブルから全件取得
     entries = models.get_entries(db)
 
+    # 表示するページ分だけ切り取る
+    # TODO sql投げる時点で一部だけ取得するようにする
+    entries, shown_page, total = viewutils.paging(entries, shown_page)
+
+    # TODO  paginationにshown_pageじゃなくってpageを直接つっこんでいいかどうか
+    # ページネイションを生成
+    pagination = Pagination(shown_page,
+                            viewutils.ENTRIES_PER_PAGE,
+                            total)
+
     # index.tplの描画
     return template("index", feeds=feeds, feed=None,
-                    entries=entries, errors=errors, request=request)
+                    entries=entries, pagination=pagination,
+                    errors=errors, request=request)
 
 
 @get("/<feed_id:int>")
@@ -47,13 +63,27 @@ def show_entry_list(db, feed_id):
     if not feed:
         return HTTPError(404, "Feed is not found.")
 
+    # パラメータから表示するページ数を取得
+    shown_page = request.params.get(key="page", default=1, type=int)
+
     # feedの更新
     errors = feedmanager.update_feed(feed)
     entries = models.get_entries(db, feed_id)
 
+    # 表示するページ分だけ切り取る
+    # TODO sql投げる時点で一部だけ取得するようにする
+    entries, shown_page, total = viewutils.paging(entries, shown_page)
+
+    # TODO  paginationにshown_pageじゃなくってpageを直接つっこんでいいかどうか
+    # ページネイションを生成
+    pagination = Pagination(shown_page,
+                            viewutils.ENTRIES_PER_PAGE,
+                            total)
+
     # index.tplの描画
     return template("index", feeds=models.get_all_feeds(db), feed=feed,
-                    entries=entries, errors=errors, request=request)
+                    entries=entries, pagination=pagination,
+                    errors=errors, request=request)
 
 
 @get("/add")

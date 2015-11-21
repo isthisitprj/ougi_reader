@@ -201,7 +201,8 @@ def get_entries(db, feed_id=None):
             Entry.feed_id == feed_id).order_by("published_at").all()
 
     if entries is not None:
-        return reversed(entries)
+        entries.reverse()
+        return entries
     else:
         return None
 
