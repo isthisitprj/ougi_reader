@@ -6,7 +6,8 @@ from bottle import HTTPError, get, post, redirect, request, run, template, url
 from wtforms import StringField, validators
 from wtforms.form import Form
 
-from models import add_feed, get_all_feeds, get_entries, get_feed, rollback
+from models import (add_feed, get_all_feeds, get_entries, get_feed,
+                    get_sum_of_unread, rollback)
 
 from utils.feedmanager import setup_feed, update_feed, update_feeds
 from utils.pagination import Pagination
@@ -55,7 +56,9 @@ def index(db):
     # index.tplの描画
     return template("index", app_root=get_app_root(), feeds=feeds, feed=None,
                     entries=entries, pagination=pagination,
-                    errors=errors, request=request)
+                    errors=errors, request=request,
+                    all_unread_num=get_sum_of_unread(db),
+                    fav_unread_num=0)
 
 
 @get("/<feed_id:int>")
@@ -85,7 +88,9 @@ def show_entry_list(db, feed_id):
     return template("index", feeds=get_all_feeds(db),
                     app_root=get_app_root(),  feed=feed,
                     entries=entries, pagination=pagination,
-                    errors=errors, request=request)
+                    errors=errors, request=request,
+                    all_unread_num=get_sum_of_unread(db),
+                    fav_unread_num=0)
 
 
 @get("/add")
@@ -95,7 +100,9 @@ def new(db):
     # add.tplの描画
     return template("edit", feeds=get_all_feeds(db),
                     app_root=get_app_root(),
-                    feed_id=None, form=form, request=request)
+                    feed_id=None, form=form, request=request,
+                    all_unread_num=get_sum_of_unread(db),
+                    fav_unread_num=0)
 
 
 @post("/add")
@@ -106,7 +113,9 @@ def create(db):
     if not form.validate():
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=None, form=form, request=request)
+                        feed_id=None, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # Feedの生成と格納(コミットも)
     feed = add_feed(db, title=form.title.data, url=form.url.data,)
@@ -117,7 +126,9 @@ def create(db):
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=None, form=form, request=request)
+                        feed_id=None, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
     same_url_feed = feed.get_another_feed_with_same_url(db)
@@ -129,7 +140,9 @@ def create(db):
         feed.delete(db)
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=None, form=form, request=request)
+                        feed_id=None, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
     redirect(get_app_root() + str(feed.id))
@@ -150,7 +163,9 @@ def edit(db, feed_id):
     # edit.tplを描画
     return template("edit", feeds=get_all_feeds(db),
                     app_root=get_app_root(),
-                    feed_id=feed_id, form=form, request=request)
+                    feed_id=feed_id, form=form, request=request,
+                    all_unread_num=get_sum_of_unread(db),
+                    fav_unread_num=0)
 
 
 @post("/<feed_id:int>/edit")
@@ -168,7 +183,9 @@ def update(db, feed_id):
     if not form.validate():
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=feed_id, form=form, request=request)
+                        feed_id=feed_id, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # feed情報を更新
     feed.title = form.title.data
@@ -180,7 +197,9 @@ def update(db, feed_id):
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=feed_id, form=form, request=request)
+                        feed_id=feed_id, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
     same_url_feed = feed.get_another_feed_with_same_url(db)
@@ -192,7 +211,9 @@ def update(db, feed_id):
         rollback(db)
         return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        feed_id=feed_id, form=form, request=request)
+                        feed_id=feed_id, form=form, request=request,
+                        all_unread_num=get_sum_of_unread(db),
+                        fav_unread_num=0)
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
     redirect(get_app_root() + str(feed.id))

@@ -167,6 +167,7 @@ def _get_now_entries(info, feed_id):
 
 
 def _make_old_entries_read(feed):
+    feed.unread_num = 0
     entries = reversed(feed.entries)
     for entry in entries:
         if not entry.read:
@@ -196,6 +197,8 @@ def update_feed(feed, info=None):
     if feed.entries:
         newEntries = _filter_new_entries(
             _sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
+
+    feed.unread_num += len(newEntries)
     feed.entries.extend(newEntries)
 
     feed.published_at = _get_published_date(info.feed)

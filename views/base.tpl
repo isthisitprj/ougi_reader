@@ -32,42 +32,57 @@
             <ul class="nav nav-sidebar">
                 <!-- not yet impl favorite -->
                 <li class="disabled">
-                    % if request.path == "/fav" and request is not None:
-                        % fav_status = "active bold"
-                    % elif request is not None:
-                        % fav_status = "bold"
-                    % else:
-                        % fav_status = ""
+                    % fav_status = ""
+                    % if request.path == "/fav":
+                        % fav_status += "active "
+                    % end
+                    % if 0 < fav_unread_num:
+                        % fav_status += "bold "
                     % end
                     <li class="{{fav_status}}">
-                        <a href="{{app_root}}fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite <span class="badge">10</span></a>
+                        <a href="{{app_root}}fav">
+                            <span class="glyphicon glyphicon-bookmark"></span> Favorite
+                            % if 0 < fav_unread_num:
+                                <span class="badge">{{fav_unread_num}}</span>
+                            % end
+                        </a>
                     </li>
                 </li>
 
-            % if request.path == "/" and request is not None:
-                % all_status = "active bold"
-            % elif request is not None:
-                % all_status = "bold"
-            % else:
-                % all_status = ""
+            % all_status = ""
+            % if request.path == "/":
+                % all_status += "active "
+            % end
+            % if 0 < all_unread_num:
+                % all_status += "bold "
             % end
             <li class="{{all_status}}">
-                <a href="{{app_root}}"><span class="glyphicon glyphicon-list-alt"></span> All <span class="badge">10</span></a>
+                <a href="{{app_root}}">
+                    <span class="glyphicon glyphicon-list-alt"></span> All
+                    % if 0 < all_unread_num:
+                        <span class="badge">{{all_unread_num}}</span>
+                    % end
+                </a>
             </li>
 
 
             % if feeds:
                 <li class="nav-divider"></li>
                 % for feed in feeds:
-                    % if request.path == "/" + str(feed.id) and feed is not None:
-                        % feed_status = "active bold"
-                    % elif feed is not None:
-                        % feed_status = "bold"
-                    % else:
-                        % feed_status = ""
+                    % unread_num = feed.unread_num
+                    % feed_status = ""
+                    % if request.path == "/" + str(feed.id):
+                        % feed_status += "active "
+                    % end
+                    % if 0 < unread_num:
+                        % feed_status += "bold "
                     % end
                     <li class="{{feed_status}}">
-                        <a href="{{app_root}}{{feed.id}}">{{feed.title}} <span class="badge">10</span></a>
+                        <a href="{{app_root}}{{feed.id}}">{{feed.title}}
+                            % if 0 < unread_num:
+                                <span class="badge">{{unread_num}}</span>
+                            % end
+                        </a>
                     </li>
                 % end
             % end

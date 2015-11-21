@@ -1,4 +1,5 @@
-% rebase('base.tpl', app_root=app_root, feeds=feeds)
+% rebase('base.tpl', app_root=app_root, feeds=feeds,
+%          all_unread_num=all_unread_num)
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     % if feed_id is None:

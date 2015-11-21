@@ -17,7 +17,7 @@ from bottle import install as bottle_install
 from bottle.ext import sqlalchemy
 
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        String, Unicode, create_engine)
+                        String, Unicode, create_engine, func)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relation
 
@@ -229,3 +229,6 @@ def get_all_feeds(db):
     :return:    Feed specified by param
     """
     return db.query(Feed).all()
+
+def get_sum_of_unread(db):
+    return db.query(func.sum(Feed.unread_num)).first()[0]
