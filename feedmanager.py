@@ -19,6 +19,7 @@ MAX_DESCRIPTION_LENGTH = 500
 
 MAX_SAMMARY_LENGTH = 2000
 
+
 def _conv_structtime_to_datetime(struct_time):
     """convert struct_time to datetime (second precision) for storing in DB."""
     # struct_time[5] is second
@@ -62,7 +63,7 @@ def _get_info_and_url(url):
     * try some patterns URL suffixes
     """
     info = feedparser.parse(url)
-    if not hasattr(info, "bozo_exception"):
+    if not "bozo_exception" in info:
         return (info, url)
 
     # exc = info.bozo_exception
@@ -76,7 +77,7 @@ def _get_info_and_url(url):
     # htmlのlink属性からのfeedurlを取得を試みる
     url_from_attr = _get_info_from_attr(url)
     info = feedparser.parse(url_from_attr)
-    if not hasattr(info, "bozo_exception"):
+    if not "bozo_exception" in info:
         return (info, url_from_attr)
 
     # exc = info.bozo_exception
@@ -89,28 +90,28 @@ def _get_info_and_url(url):
     for suffix in feed_suffixes:
         url_from_pattern = url + suffix
         info = feedparser.parse(url_from_pattern)
-        if not hasattr(info, "bozo_exception"):
+        if not "bozo_exception" in info:
             return (info, url_from_pattern)
 
     # feedが取得できなかった
     return None
 
 
-def _get_feed_date(feed):
-    """get date as feed.published_at.
+def _get_published_date(something_info):
+    """get date as published_at from info.feed or info.entries[i].
 
     :rtype:     datetime
-    :return:    date as feed.published_at
+    :return:    date as feed.published_at or entiy.published_at
 
-    If feed is RSS feed, it hasn't updated_parsed.
+    If something_info is RSS feed, it hasn't updated_parsed.
     So return published_parsed.
-    And if feed is Atom feed, it hasn't published_parsed.
+    And if something_info is Atom feed, it hasn't published_parsed.
     So returnupdated_parsed.
     """
-    if hasattr(feed, 'published_parsed'):  # RSSのfeedの場合
-        return _conv_structtime_to_datetime(feed.published_parsed)
-    elif hasattr(feed, 'updated_parsed'):  # Atomのfeedの場合
-        return _conv_structtime_to_datetime(feed.updated_parsed)
+    if "published_parsed" in something_info:  # RSSのfeedの場合
+        return _conv_structtime_to_datetime(something_info.published_parsed)
+    elif "updated_parsed" in something_info:  # Atomのfeedの場合
+        return _conv_structtime_to_datetime(something_info.updated_parsed)
     else:
         return None
 
@@ -160,8 +161,8 @@ def _get_now_entries(info, feed_id):
             description = e.sammary
             if MAX_SAMMARY_LENGTH < len(description):
                 description = description[:MAX_SAMMARY_LENGTH] + u"…"
-        entryList.append(Entry(e.title,  _conv_structtime_to_datetime(
-            e.published_parsed), feed_id, e.link, description))
+        entryList.append(Entry(e.title,
+            _get_published_date(e), feed_id, e.link, description))
     return entryList
 
 
@@ -185,7 +186,7 @@ def update_feed(feed, info=None):
             _sorted_by_pubdate_in_des(newEntries), feed.last_updated_at)
     feed.entries.extend(newEntries)
 
-    feed.published_at = _get_feed_date(info.feed)
+    feed.published_at = _get_published_date(info.feed)
     feed.last_updated_at = datetime.now()
 
 
@@ -202,7 +203,7 @@ def update_feeds(feeds_list):
             # update_feedにNoneを渡しても、中でよしなにしてくれるけど、
             # 重たい処理なのでこっちでbreakする
             errors.append(u"%s(%d)の記事を取得できませんでした。" % (feed.title, feed.id))
-            break
+            continue
         info = info_and_url[0]
         feed.url = info_and_url[1]
         update_feed(feed, info)
