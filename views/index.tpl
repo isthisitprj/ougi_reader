@@ -27,9 +27,18 @@
             <tbody>
             % if entries:
                 % for entry in entries:
-                <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % if entry is None:
+                    <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % else:
+                    <tr class="clickable active" data-toggle="collapse" data-target="#{{entry.id}}">
+                    % end
+
                     <td>{{entry.feed.title}}</td>
+                    % if entry is None:
                     <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
+                    % else:
+                    <td class="bold"><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
+                    % end
                     <td>{{entry.published_at}}</td>
                 </tr>
                 <tr>

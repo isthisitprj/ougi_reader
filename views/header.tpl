@@ -59,8 +59,8 @@
             padding-bottom: 20px;
         }
 
-        .icon-right {
-            padding-right: 10px;
+        .nav-sidebar .unread {
+            font-weight: bold;
         }
 
         /* main */
@@ -80,6 +80,12 @@
         .pagination-layout {
             width: 100%;
             text-align: center;
+        }
+
+        /* font-style */
+
+        .bold {
+            font-weight: bold;
         }
 
     </style>
