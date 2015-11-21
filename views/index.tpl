@@ -5,6 +5,9 @@
         <h1 class="page-header">全フィードの記事一覧</h1>
     % else:
         <h1 class="page-header">{{title}}の記事一覧</h1>
+        <div class="row">
+            <a href="./edit" type="button" class="btn bgn-sm btn-default pull-right" role="button">フィード編集</a>
+        </div>
     % end
 
     % if errors:
