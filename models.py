@@ -104,6 +104,25 @@ class Feed(Base):
             len(self.entries)
         )
 
+    def delete(self, db):
+        db.delete(self)
+
+    def get_another_feed_with_same_url(self, db):
+        """get a feed with the URL but without the id specified by param  .
+
+        :rtype:     Feed or None
+        :return:    Feed with URL specified by param
+
+        If a feed with the URL but without the id exists,
+        return it (only first one).
+        If not, return None.
+        """
+        # 有無が知りたいので、先頭だけでよい(むしろ複数あるような状態がおかしい)
+        feed = db.query(Feed).filter(Feed.id != self.id,
+                                     Feed.url == self.url).first()
+        return feed
+
+
 
 class Entry(Base):
 
@@ -201,17 +220,3 @@ def get_all_feeds(db):
     :return:    Feed specified by param
     """
     return db.query(Feed).all()
-
-
-def get_same_url_feed(db, feed_url):
-    """get a feed with URL specified by param.
-
-    :rtype:     Feed or None
-    :return:    Feed with URL specified by param
-
-    If a feed with URL specified by param exists, return it (only first one).
-    If not, return None.
-    """
-    # 有無が知りたいので、先頭だけでよい(むしろ複数あるような状態がおかしい)
-    feed = db.query(Feed).filter(Feed.url == feed_url).first()
-    return feed
