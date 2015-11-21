@@ -36,7 +36,7 @@ def get_conection_string():
     """
     config_pass = os.path.join(os.path.dirname(__file__), CONFIG_FILENAME)
     if os.path.isfile(config_pass):
-        with open(config_pass, 'r') as cf:
+        with open(config_pass, "r") as cf:
             conf_dic = yaml.load(cf)  # 読み込む
         if not isinstance(conf_dic, dict):
             conf_dic = {}
@@ -64,7 +64,7 @@ engine = create_engine(get_conection_string(), echo=False)
 plugin = sqlalchemy.Plugin(
     engine,
     Base.metadata,
-    keyword='db',  # 関数内で挿入される場合の変数名
+    keyword="db",  # 関数内で挿入される場合の変数名
     create=True,  # テーブルを作成するか
     commit=True,  # 関数終了時にコミットするか
     use_kwargs=False
@@ -79,7 +79,7 @@ class Feed(Base):
     """Feed (RSS or Atom) for storeing DB."""
 
     # feedsテーブル
-    __tablename__ = 'feeds'
+    __tablename__ = "feeds"
 
     # カラムの定義
     id = Column(Integer, primary_key=True)
@@ -109,19 +109,19 @@ class Entry(Base):
 
     """Entry of Feed for storeing DB."""
 
-    __tablename__ = 'entries'
+    __tablename__ = "entries"
     id = Column(Integer, primary_key=True)
     title = Column(Unicode(100), nullable=False)
     published_at = Column(DateTime)
     # ...
-    feed_id = Column(Integer, ForeignKey('feeds.id'))
+    feed_id = Column(Integer, ForeignKey("feeds.id"))
 
     read = Column(Boolean, default=False)
     read_at = Column(DateTime)
     url = Column(String(2000), nullable=False)
     description = Column(Unicode(2000))
 
-    feed = relation(Feed, backref=backref('entries', order_by=id),
+    feed = relation(Feed, backref=backref("entries", order_by=id),
                     cascade="all, delete, delete-orphan", single_parent=True)
 
     def __init__(self, title, published_at, feed_id, url, description,
