@@ -1,12 +1,12 @@
 % rebase('base.tpl', feeds=feeds)
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    % if title is None:
+    % if feed is None:
         <h1 class="page-header">全フィードの記事一覧</h1>
     % else:
-        <h1 class="page-header">{{title}}の記事一覧</h1>
+        <h1 class="page-header">{{feed.title}}の記事一覧</h1>
         <div class="row">
-            <a href="./edit" type="button" class="btn btn-sm btn-default pull-right btn-edit" role="button">フィード編集</a>
+            <a href="./{{feed.id}}/edit" type="button" class="btn btn-sm btn-default pull-right btn-edit" role="button">フィード編集</a>
         </div>
     % end
 
@@ -30,14 +30,14 @@
             <tbody>
             % if entries:
                 % for entry in entries:
-                    % if entry is None:
+                    % if entry.read:
                     <tr class="clickable" data-toggle="collapse" data-target="#{{entry.id}}">
                     % else:
                     <tr class="clickable active" data-toggle="collapse" data-target="#{{entry.id}}">
                     % end
 
                     <td>{{entry.feed.title}}</td>
-                    % if entry is None:
+                    % if entry.read:
                     <td><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>
                     % else:
                     <td class="bold"><a href="{{entry.url}}" target="_blank">{{entry.title}}</a></td>

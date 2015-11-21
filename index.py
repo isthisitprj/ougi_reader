@@ -35,7 +35,7 @@ def index(db):
     entries = models.get_entries(db)
 
     # index.tplの描画
-    return template("index", feeds=feeds, title=None,
+    return template("index", feeds=feeds, feed=None,
                     entries=entries, errors=errors, request=request)
 
 
@@ -52,7 +52,7 @@ def show_entry_list(db, feed_id):
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画
-    return template("index", feeds=models.get_all_feeds(db), title=feed.title,
+    return template("index", feeds=models.get_all_feeds(db), feed=feed,
                     entries=entries, errors=errors, request=request)
 
 
