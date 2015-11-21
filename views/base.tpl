@@ -40,7 +40,7 @@
                         % fav_status = ""
                     % end
                     <li class="{{fav_status}}">
-                        <a href="./fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite 10</a>
+                        <a href="./fav"><span class="glyphicon glyphicon-bookmark"></span> Favorite <span class="badge">10</span></a>
                     </li>
                 </li>
 
@@ -52,7 +52,7 @@
                 % all_status = ""
             % end
             <li class="{{all_status}}">
-                <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All 10</a>
+                <a href="./"><span class="glyphicon glyphicon-list-alt"></span> All <span class="badge">10</span></a>
             </li>
 
 
@@ -67,7 +67,7 @@
                         % feed_status = ""
                     % end
                     <li class="{{feed_status}}">
-                        <a href="./{{feed.id}}">{{feed.title}} 10</a>
+                        <a href="./{{feed.id}}">{{feed.title}} <span class="badge">10</span></a>
                     </li>
                 % end
             % end

@@ -6,7 +6,7 @@
     % else:
         <h1 class="page-header">{{title}}の記事一覧</h1>
         <div class="row">
-            <a href="./edit" type="button" class="btn bgn-sm btn-default pull-right" role="button">フィード編集</a>
+            <a href="./edit" type="button" class="btn btn-sm btn-default pull-right btn-edit" role="button">フィード編集</a>
         </div>
     % end
 

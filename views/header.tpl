@@ -82,6 +82,10 @@
             text-align: center;
         }
 
+        .btn-edit {
+            margin-right: 15px;
+        }
+
         /* font-style */
 
         .bold {
