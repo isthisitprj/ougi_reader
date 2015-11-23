@@ -51,7 +51,7 @@ def _get_info_from_attr(url):
     return None
 
 
-def _get_info_and_url(url):
+def _get_info_and_url(url, etag=None):
     """get feed info and URL in taple (info, url).
 
     :rtype:     (info, url)
@@ -62,7 +62,10 @@ def _get_info_and_url(url):
     * *not yet impl* search link tag in html rerurned by plain param
     * try some patterns URL suffixes
     """
-    info = feedparser.parse(url)
+    if etag is None:
+        info = feedparser.parse(url)
+    else:
+        info = feedparser.parse(url, etag=etag)
     if "bozo_exception" not in info:
         return (info, url)
 
@@ -186,12 +189,15 @@ def update_feed(feed, info=None):
     _make_old_entries_read(feed)
 
     if info is None:
-        info_and_url = _get_info_and_url(feed.url)
+        info_and_url = _get_info_and_url(feed.url, etag=feed.etag)
         if info_and_url is None:
             return [u"%s(%d)を取得できませんでした。" % (feed.title, feed.id)]
 
         info = info_and_url[0]
         feed.url = info_and_url[1]
+        if "etag" in info:
+            feed.etag = info.etag
+
 
     newEntries = _get_now_entries(info, feed.id)
     if feed.entries:
@@ -223,6 +229,8 @@ def update_feeds(feeds_list):
             continue
         info = info_and_url[0]
         feed.url = info_and_url[1]
+        if "etag" in info:
+            feed.etag = info.etag
         update_feed(feed, info)
     return errors
 

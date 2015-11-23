@@ -88,14 +88,16 @@ class Feed(Base):
     last_updated_at = Column(DateTime)
     published_at = Column(DateTime)
     unread_num = Column(Integer, default=0)
+    etag = Column(String(100))
 
     def __init__(self, url, title=None, published_at=None,
-                 last_updated_at=None, unread_num=0):
+                 last_updated_at=None, unread_num=0, etag=None):
         self.title = title
         self.url = url
         self.published_at = published_at
         self.last_updated_at = last_updated_at
         self.unread_num = unread_num
+        self.etag = etag
 
 
     def delete(self, db):
