@@ -47,10 +47,10 @@ def get_conection_string():
     password = conf_dic.get("password", "ougi_reader0")
     hostname = conf_dic.get("hostname", "localhost")
     ip = conf_dic.get("ip", "3306")
-    table = conf_dic.get("table", "ougi_reader")
+    database = conf_dic.get("database", "ougi_reader")
 
     return "mysql://%s:%s@%s:%s/%s?charset=utf8" % (username, password,
-                                                    hostname, ip, table)
+                                                    hostname, ip, database)
 
 
 # run below, when this module is imported
