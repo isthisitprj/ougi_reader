@@ -6,10 +6,11 @@ from bottle import HTTPError, get, post, redirect, request, run, template, url
 from wtforms import StringField, validators
 from wtforms.form import Form
 
-from utils.feedmanager import setup_feed, update_feed, update_feeds
 from models import add_feed, get_all_feeds, get_entries, get_feed, rollback
-from utils.viewutils import ENTRIES_PER_PAGE, get_shwon_entries
+
+from utils.feedmanager import setup_feed, update_feed, update_feeds
 from utils.pagination import Pagination
+from utils.viewutils import ENTRIES_PER_PAGE, get_shwon_entries
 
 
 class FeedForm(Form):
@@ -108,10 +109,7 @@ def create(db):
                         form=form, request=request)
 
     # Feedの生成と格納(コミットも)
-    feed = add_feed(db,
-                           title=form.title.data,
-                           url=form.url.data,
-                           )
+    feed = add_feed(db, title=form.title.data, url=form.url.data,)
 
     feed = setup_feed(feed)
 

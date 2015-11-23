@@ -63,7 +63,7 @@ def _get_info_and_url(url):
     * try some patterns URL suffixes
     """
     info = feedparser.parse(url)
-    if not "bozo_exception" in info:
+    if "bozo_exception" not in info:
         return (info, url)
 
     # exc = info.bozo_exception
@@ -77,7 +77,7 @@ def _get_info_and_url(url):
     # htmlのlink属性からのfeedurlを取得を試みる
     url_from_attr = _get_info_from_attr(url)
     info = feedparser.parse(url_from_attr)
-    if not "bozo_exception" in info:
+    if "bozo_exception" not in info:
         return (info, url_from_attr)
 
     # exc = info.bozo_exception
@@ -90,7 +90,7 @@ def _get_info_and_url(url):
     for suffix in feed_suffixes:
         url_from_pattern = url + suffix
         info = feedparser.parse(url_from_pattern)
-        if not "bozo_exception" in info:
+        if "bozo_exception" not in info:
             return (info, url_from_pattern)
 
     # feedが取得できなかった
@@ -161,9 +161,10 @@ def _get_now_entries(info, feed_id):
             description = e.sammary
             if MAX_SAMMARY_LENGTH < len(description):
                 description = description[:MAX_SAMMARY_LENGTH] + u"…"
-        entryList.append(Entry(e.title,
-            _get_published_date(e), feed_id, e.link, description))
+        entryList.append(Entry(e.title, _get_published_date(e), feed_id,
+                               e.link, description))
     return entryList
+
 
 def _make_old_entries_read(feed):
     entries = reversed(feed.entries)

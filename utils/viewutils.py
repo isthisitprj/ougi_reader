@@ -3,7 +3,7 @@
 
 import math
 
-import models
+# import models
 
 
 ENTRIES_PER_PAGE = 20
@@ -22,7 +22,7 @@ def get_shwon_entries(entries, shown_page):
         last_index = shown_page * ENTRIES_PER_PAGE
 
         print "entries_length:%d, last_page:%d, first: %d, last: %d" %\
-                (len(entries), last_page, first_index, last_index)
+            (len(entries), last_page, first_index, last_index)
 
         if last_index < entries_length:
             entries = entries[first_index:last_index]

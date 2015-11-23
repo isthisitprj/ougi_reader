@@ -2,9 +2,9 @@
 
 """models - for access DB.
 
-    * connect DB using setting in config file
-    * define Feed and Entry class and table
-    * get, add, delete, edit feeds and entries in DB
+* connect DB using setting in config file
+* define Feed and Entry class and table
+* get, add, delete, edit feeds and entries in DB
 """
 
 
@@ -123,7 +123,6 @@ class Feed(Base):
         return feed
 
 
-
 class Entry(Base):
 
     """Entry of Feed for storeing DB."""
@@ -135,7 +134,7 @@ class Entry(Base):
     # ...
     feed_id = Column(Integer, ForeignKey("feeds.id", onupdate="CASCADE",
                                          ondelete="CASCADE"),
-                    nullable=False)
+                     nullable=False)
 
     read = Column(Boolean, default=False)
     read_at = Column(DateTime)
@@ -143,7 +142,8 @@ class Entry(Base):
     description = Column(Unicode(2000))
 
     feed = relation(Feed, backref=backref("entries", order_by=id,
-                                          cascade="all, delete, delete-orphan", single_parent=True))
+                                          cascade="all, delete, delete-orphan",
+                                          single_parent=True))
 
     def __init__(self, title, published_at, feed_id, url, description,
                  read=False, read_at=None):
@@ -164,6 +164,7 @@ class Entry(Base):
 
 def rollback(db):
     db.rollback()
+
 
 def add_feed(db, url, title=None):
     """create Feed object and add and commit it to DB (to make id abalable).
