@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """index - routing for ougi reader."""
 
-from bottle import HTTPError, get, post, redirect, request, run, template
+from bottle import HTTPError, get, post, redirect, request, run, template, url
 
 from wtforms import StringField, validators
 from wtforms.form import Form
@@ -24,7 +24,11 @@ class FeedForm(Form):
     ])
 
 
-@get("/")
+def get_app_root():
+    return url("app_root_url")
+
+
+@get("/", name="app_root_url")
 def index(db):
     feeds = models.get_all_feeds(db)
 
@@ -35,7 +39,7 @@ def index(db):
     entries = models.get_entries(db)
 
     # index.tplの描画
-    return template("index", feeds=feeds, feed=None,
+    return template("index", app_root=get_app_root(), feeds=feeds, feed=None,
                     entries=entries, errors=errors, request=request)
 
 
@@ -52,7 +56,8 @@ def show_entry_list(db, feed_id):
     entries = models.get_entries(db, feed_id)
 
     # index.tplの描画
-    return template("index", feeds=models.get_all_feeds(db), feed=feed,
+    return template("index", feeds=models.get_all_feeds(db),
+                    app_root=get_app_root(),  feed=feed,
                     entries=entries, errors=errors, request=request)
 
 
@@ -62,6 +67,7 @@ def new(db):
 
     # add.tplの描画
     return template("add", feeds=models.get_all_feeds(db),
+                    app_root=get_app_root(),
                     form=form, request=request)
 
 
@@ -72,6 +78,7 @@ def create(db):
     # フォームのバリデーション
     if not form.validate():
         return template("add", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         form=form, request=request)
 
     # Feedの生成と格納(コミットも)
@@ -85,6 +92,7 @@ def create(db):
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
         return template("add", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         form=form, request=request)
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
@@ -96,10 +104,11 @@ def create(db):
         # insertしてしまっているので、元に戻す為には削除する
         feed.delete(db)
         return template("add", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         form=form, request=request)
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
-    redirect("/" + str(feed.id))
+    redirect(get_app_root() + str(feed.id))
 
 
 @get("/<feed_id:int>/edit")
@@ -116,6 +125,7 @@ def edit(db, feed_id):
 
     # edit.tplを描画
     return template("edit", feeds=models.get_all_feeds(db),
+                    app_root=get_app_root(),
                     feed_id=feed_id, form=form, request=request)
 
 
@@ -133,6 +143,7 @@ def update(db, feed_id):
     # フォームのバリデーション
     if not form.validate():
         return template("edit", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
     # feed情報を更新
@@ -144,6 +155,7 @@ def update(db, feed_id):
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
         return template("edit", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
@@ -155,10 +167,11 @@ def update(db, feed_id):
         # addのときと違い、コミットまでははしていない
         models.rollback(db)
         return template("edit", feeds=models.get_all_feeds(db),
+                        app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
-    redirect("/" + str(feed.id))
+    redirect(get_app_root() + str(feed.id))
 
 
 @post("/<feed_id:int>/delete")
@@ -175,7 +188,7 @@ def destroy(db, feed_id):
     feed.delete(db)
 
     # 一覧画面へリダイレクト
-    redirect("/")
+    redirect(get_app_root())
 
 
 if __name__ == "__main__":

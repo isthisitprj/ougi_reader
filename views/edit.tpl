@@ -1,7 +1,7 @@
-% rebase('base.tpl', feeds=feeds)
+% rebase('base.tpl', app_root=app_root, feeds=feeds)
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    % if request.path == "/add":
+    % if request.path == app_root + "/add":
         <h1 class="page-header">RSS登録</h1>
     % else:
         <h1 class="page-header">RSS編集</h1>
@@ -9,10 +9,10 @@
 
     <div class="col-md-5">
 
-        % if request.path == "/add":
+        % if request.path == app_root + "/add":
             <form action="./add" method="post">
         % else:
-            <form action="../{{feed_id}}/edit" method="post">
+            <form action="./edit" method="post">
         % end
 
         <div class="form-group">
@@ -41,7 +41,7 @@
             % end
         </div>
 
-        % if request.path == "/add":
+        % if request.path == app_root + "/add":
             <input type="submit" class="btn btn-default" value="作成する"/>
         % else:
             <input type="submit" class="btn btn-default" value="更新する"/>
