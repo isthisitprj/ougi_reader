@@ -93,9 +93,9 @@ def new(db):
     form = FeedForm()
 
     # add.tplの描画
-    return template("add", feeds=get_all_feeds(db),
+    return template("edit", feeds=get_all_feeds(db),
                     app_root=get_app_root(),
-                    form=form, request=request)
+                    feed_id=None, form=form, request=request)
 
 
 @post("/add")
@@ -104,9 +104,9 @@ def create(db):
 
     # フォームのバリデーション
     if not form.validate():
-        return template("add", feeds=get_all_feeds(db),
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        form=form, request=request)
+                        feed_id=None, form=form, request=request)
 
     # Feedの生成と格納(コミットも)
     feed = add_feed(db, title=form.title.data, url=form.url.data,)
@@ -115,9 +115,9 @@ def create(db):
 
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
-        return template("add", feeds=get_all_feeds(db),
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        form=form, request=request)
+                        feed_id=None, form=form, request=request)
 
     # feedを既存から検索し、重複していればエラー扱い&コミットしない
     same_url_feed = feed.get_another_feed_with_same_url(db)
@@ -127,9 +127,9 @@ def create(db):
             u"すでに同じフィードが登録されています。(「%s」)" % same_url_feed.title)
         # insertしてしまっているので、元に戻す為には削除する
         feed.delete(db)
-        return template("add", feeds=get_all_feeds(db),
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
-                        form=form, request=request)
+                        feed_id=None, form=form, request=request)
 
     # 該当フィードの記事の一覧画面へリダイレクト(リダイレクト先で更新処理が行われる)
     redirect(get_app_root() + str(feed.id))
