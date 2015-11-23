@@ -6,8 +6,8 @@ from bottle import HTTPError, get, post, redirect, request, run, template, url
 from wtforms import StringField, validators
 from wtforms.form import Form
 
-import feedmanager
-import models
+from utils.feedmanager import setup_feed, update_feed, update_feeds
+from models import add_feed, get_all_feeds, get_entries, get_feed, rollback
 
 
 class FeedForm(Form):
@@ -30,13 +30,13 @@ def get_app_root():
 
 @get("/", name="app_root_url")
 def index(db):
-    feeds = models.get_all_feeds(db)
+    feeds = get_all_feeds(db)
 
     # feedの更新
-    errors = feedmanager.update_feeds(feeds)
+    errors = update_feeds(feeds)
 
     # entriesテーブルから全件取得
-    entries = models.get_entries(db)
+    entries = get_entries(db)
 
     # index.tplの描画
     return template("index", app_root=get_app_root(), feeds=feeds, feed=None,
@@ -46,17 +46,17 @@ def index(db):
 @get("/<feed_id:int>")
 def show_entry_list(db, feed_id):
     # Feedの検索
-    feed = models.get_feed(db, feed_id)
+    feed = get_feed(db, feed_id)
     # Feedが存在しない(404を表示）
     if not feed:
         return HTTPError(404, "Feed is not found.")
 
     # feedの更新
-    errors = feedmanager.update_feed(feed)
-    entries = models.get_entries(db, feed_id)
+    errors = update_feed(feed)
+    entries = get_entries(db, feed_id)
 
     # index.tplの描画
-    return template("index", feeds=models.get_all_feeds(db),
+    return template("index", feeds=get_all_feeds(db),
                     app_root=get_app_root(),  feed=feed,
                     entries=entries, errors=errors, request=request)
 
@@ -66,7 +66,7 @@ def new(db):
     form = FeedForm()
 
     # add.tplの描画
-    return template("add", feeds=models.get_all_feeds(db),
+    return template("add", feeds=get_all_feeds(db),
                     app_root=get_app_root(),
                     form=form, request=request)
 
@@ -77,21 +77,21 @@ def create(db):
 
     # フォームのバリデーション
     if not form.validate():
-        return template("add", feeds=models.get_all_feeds(db),
+        return template("add", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         form=form, request=request)
 
     # Feedの生成と格納(コミットも)
-    feed = models.add_feed(db,
+    feed = add_feed(db,
                            title=form.title.data,
                            url=form.url.data,
                            )
 
-    feed = feedmanager.setup_feed(feed)
+    feed = setup_feed(feed)
 
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
-        return template("add", feeds=models.get_all_feeds(db),
+        return template("add", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         form=form, request=request)
 
@@ -103,7 +103,7 @@ def create(db):
             u"すでに同じフィードが登録されています。(「%s」)" % same_url_feed.title)
         # insertしてしまっているので、元に戻す為には削除する
         feed.delete(db)
-        return template("add", feeds=models.get_all_feeds(db),
+        return template("add", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         form=form, request=request)
 
@@ -114,7 +114,7 @@ def create(db):
 @get("/<feed_id:int>/edit")
 def edit(db, feed_id):
     # Feedの検索
-    feed = models.get_feed(db, feed_id)
+    feed = get_feed(db, feed_id)
 
     # Feedが存在しない(404を表示）
     if not feed:
@@ -124,7 +124,7 @@ def edit(db, feed_id):
     form = FeedForm(request.POST, feed)
 
     # edit.tplを描画
-    return template("edit", feeds=models.get_all_feeds(db),
+    return template("edit", feeds=get_all_feeds(db),
                     app_root=get_app_root(),
                     feed_id=feed_id, form=form, request=request)
 
@@ -132,7 +132,7 @@ def edit(db, feed_id):
 @post("/<feed_id:int>/edit")
 def update(db, feed_id):
     # Feedの検索
-    feed = models.get_feed(db, feed_id)
+    feed = get_feed(db, feed_id)
 
     # Feedが存在しない(404を表示）
     if not feed:
@@ -142,7 +142,7 @@ def update(db, feed_id):
 
     # フォームのバリデーション
     if not form.validate():
-        return template("edit", feeds=models.get_all_feeds(db),
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
@@ -150,11 +150,11 @@ def update(db, feed_id):
     feed.title = form.title.data
     feed.url = form.url.data
 
-    feed = feedmanager.setup_feed(feed)
+    feed = setup_feed(feed)
 
     if feed is None:
         form.url.errors.append(u"URLからフィードを取得できませんでした。")
-        return template("edit", feeds=models.get_all_feeds(db),
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
@@ -165,8 +165,8 @@ def update(db, feed_id):
         form.url.errors.append(
             u"すでに同じフィードが登録されています。(「%s」)" % same_url_feed.title)
         # addのときと違い、コミットまでははしていない
-        models.rollback(db)
-        return template("edit", feeds=models.get_all_feeds(db),
+        rollback(db)
+        return template("edit", feeds=get_all_feeds(db),
                         app_root=get_app_root(),
                         feed_id=feed_id, form=form, request=request)
 
@@ -178,7 +178,7 @@ def update(db, feed_id):
 def destroy(db, feed_id):
 
     # Feedの検索
-    feed = models.get_feed(db, feed_id)
+    feed = get_feed(db, feed_id)
 
     # Feedが存在しない(404を表示）
     if not feed:
