@@ -97,14 +97,6 @@ class Feed(Base):
         self.last_updated_at = last_updated_at
         self.unread_num = unread_num
 
-    def __repr__(self):
-        return "<Feed('%s', '%s', '%s', '%s', '%d')>" % (
-            self.title,
-            self.url,
-            self.published_at,
-            self.last_updated_at,
-            len(self.entries)
-        )
 
     def delete(self, db):
         db.delete(self)
@@ -158,10 +150,6 @@ class Entry(Base):
         self.read_at = read_at
         self.url = url
         self.description = description
-
-    def __repr__(self):
-        return "<Entry('%s', '%s', '%d')>" % (self.title, self.url,
-                                              self.feed_id)
 
 
 def rollback(db):

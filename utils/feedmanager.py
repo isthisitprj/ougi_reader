@@ -126,18 +126,18 @@ def _filter_new_entries(newList, last_updated_at):
         return newList
 
     entryList = []
-    print "last_updaTed_at: " + str(last_updated_at)
+    # print "last_updaTed_at: " + str(last_updated_at)
 
     for e in newList:
         newEntryDate = e.published_at
-        print "newEntryDate: " + str(newEntryDate)
+        # print "newEntryDate: " + str(newEntryDate)
         if newEntryDate > last_updated_at:
             continue
         elif newEntryDate == last_updated_at:
             # TODO 後で頑張る？
             continue
         else:
-            print "* get %d new entries" % newList.index(e)
+            # print "* get %d new entries" % newList.index(e)
             entryList = newList[:newList.index(e)]
             break
 
