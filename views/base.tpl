@@ -1,4 +1,4 @@
-% include('header.tpl')
+% include('header.tpl', app_root=app_root)
 
 <body>
 

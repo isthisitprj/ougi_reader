@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """index - routing for ougi reader."""
 
-from bottle import HTTPError, get, post, redirect, request, run, template, url
+from bottle import (HTTPError, get, post, redirect, request, run, static_file,
+                    template, url)
 
 from wtforms import StringField, validators
 from wtforms.form import Form
@@ -234,6 +235,12 @@ def destroy(db, feed_id):
 
     # 一覧画面へリダイレクト
     redirect(get_app_root())
+
+
+# @get('/http_public/<filepath:path>')
+@get('/public_html/<filepath:path>')
+def static(filepath):
+    return static_file(filepath, root="./")
 
 
 if __name__ == "__main__":
