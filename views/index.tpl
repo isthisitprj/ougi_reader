@@ -5,9 +5,15 @@
         <h1 class="page-header">全フィードの記事一覧</h1>
     % else:
         <h1 class="page-header">{{feed.title}}の記事一覧</h1>
+
         <div class="row">
-            <a href="./{{feed.id}}/edit" type="button" class="btn btn-sm btn-default pull-right btn-edit" role="button">フィード編集</a>
-        </div>
+            <div class="pull-right btn-list">
+                <ul class="list-inline">
+                    <li class="btn-edit"><a href="./{{feed.id}}/edit" type="button" class="btn btn-sm btn-default" role="button">フィード編集</a></li>
+                    <li class="btn-edit"><a href="./{{feed.id}}/delete" type="button" class="btn btn-sm btn-default" role="button">フィード削除</a></li>
+                </ul>
+            </div>
+       </div>
     % end
 
     % if errors:

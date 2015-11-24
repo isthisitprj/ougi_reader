@@ -82,12 +82,11 @@
             text-align: center;
         }
 
-        .btn-edit {
-            margin-right: 15px;
+        .btn-list {
+           margin: 0 10px;
         }
 
         /* font-style */
-
         .bold {
             font-weight: bold;
         }
