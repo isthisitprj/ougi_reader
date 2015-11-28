@@ -10,11 +10,16 @@
             <div class="pull-right btn-list">
                 <ul class="list-inline">
                     <li class="btn-edit"><a href="./{{feed.id}}/edit" type="button" class="btn btn-sm btn-default" role="button">フィード編集</a></li>
-                    <li class="btn-edit"><a href="./{{feed.id}}/delete" type="button" class="btn btn-sm btn-default" role="button">フィード削除</a></li>
+                    <li class="btn-edit">
+                        <form action="./{{feed.id}}/delete" method="post">
+                            <input type="submit" class="btn btn-sm btn-default" value="フィード削除"/>
+                        </form>
+                    </li>
                 </ul>
             </div>
        </div>
     % end
+
 
     % if errors:
          <div class="errors">
