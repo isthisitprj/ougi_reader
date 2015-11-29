@@ -10,6 +10,7 @@
 
 # 設定ファイル読み込み用
 import os.path
+from datetime import datetime, timedelta
 
 import yaml
 
@@ -19,20 +20,23 @@ from bottle.ext import sqlalchemy
 from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
                         String, Unicode, create_engine, func)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref, relation
+from sqlalchemy.orm import backref, relation, sessionmaker
 
 
 CONFIG_FILENAME = "config.yaml"
 
+CONECTION_STRING = None
+EXPIRE_DAYS = 0
 
-def get_conection_string():
-    """get conection string for sqlalchemy.create_engine by using config file.
 
-    :rtype:     String
-    :return:    conection string for sqlalchemy.create_engine
+def load_configs():
+    """get configs from config file, and set the global variables.
 
     load params from config file (./config.yaml),
     and if params isn't setted, use default value.
+    set conection string to the global variable for sqlalchemy.create_engine
+    by using config file,
+    and expire days to the global variable for deleting old read entries.
     """
     config_pass = os.path.join(os.path.dirname(__file__), CONFIG_FILENAME)
     if os.path.isfile(config_pass):
@@ -53,6 +57,29 @@ def get_conection_string():
                                                     hostname, ip, database)
 
 
+
+def delete_expired_entries(db=None):
+    """delete old entries which has been read for expire days.
+
+    expire days is specified by config file.
+    """
+    if db is None:
+        Session = sessionmaker(bind=engine)
+        session = Session()
+    else:
+        session = db
+
+    if 0 < EXPIRE_DAYS:
+        expire_datetime = datetime.now() - timedelta(EXPIRE_DAYS)
+        session.query(Entry).filter(Entry.read == True,
+                                    Entry.read_at < expire_datetime).delete()
+        session.commit()
+
+    if db is None:
+        session.close()
+
+
+# initialization
 # run below, when this module is imported
 
 # 初期化処理
@@ -72,6 +99,9 @@ plugin = sqlalchemy.Plugin(
 
 # プラグインのインストール
 bottle_install(plugin)
+
+
+# initialization continues after class definition
 
 
 class Feed(Base):
@@ -152,6 +182,12 @@ class Entry(Base):
         self.read_at = read_at
         self.url = url
         self.description = description
+
+
+# 起動時にも古いものを削除
+delete_expired_entries()
+
+# end of initialization
 
 
 def rollback(db):

@@ -175,6 +175,7 @@ def _make_old_entries_read(feed):
     for entry in entries:
         if not entry.read:
             entry.read = True
+            entry.read_at = datetime.now()
         else:
             break
 
