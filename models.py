@@ -8,17 +8,16 @@
 """
 
 
-# 設定ファイル読み込み用
-import os.path
 from datetime import datetime, timedelta
+import os.path  # 設定ファイル読み込み用
 
-import yaml
+import yaml  # 設定ファイル読み込み用
 
 from bottle import install as bottle_install
 from bottle.ext import sqlalchemy
 
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        String, Unicode, create_engine, func)
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
+                        Unicode, create_engine, func)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relation, sessionmaker
 
@@ -53,9 +52,14 @@ def load_configs():
     ip = conf_dic.get("ip", "3306")
     database = conf_dic.get("database", "ougi_reader")
 
-    return "mysql://%s:%s@%s:%s/%s?charset=utf8" % (username, password,
-                                                    hostname, ip, database)
+    global CONECTION_STRING
+    CONECTION_STRING = "mysql://%s:%s@%s:%s/%s?charset=utf8" % (username,
+                                                                password,
+                                                                hostname, ip,
+                                                                database)
 
+    global EXPIRE_DAYS
+    EXPIRE_DAYS = conf_dic.get("expiredays", 0)
 
 
 def delete_expired_entries(db=None):
@@ -82,10 +86,12 @@ def delete_expired_entries(db=None):
 # initialization
 # run below, when this module is imported
 
+load_configs()
+
 # 初期化処理
 Base = declarative_base()
 
-engine = create_engine(get_conection_string(), echo=False)
+engine = create_engine(CONECTION_STRING, echo=False)
 
 # bottle-sqlalchemyの設定
 plugin = sqlalchemy.Plugin(
@@ -129,12 +135,11 @@ class Feed(Base):
         self.unread_num = unread_num
         self.etag = etag
 
-
     def delete(self, db):
         db.delete(self)
 
     def get_another_feed_with_same_url(self, db):
-        """get a feed with the URL but without the id specified by param  .
+        """get a feed with the URL but without the id specified by param.
 
         :rtype:     Feed or None
         :return:    Feed with URL specified by param
@@ -191,6 +196,7 @@ delete_expired_entries()
 
 
 def rollback(db):
+    """cancel changes on the session."""
     db.rollback()
 
 
@@ -256,5 +262,7 @@ def get_all_feeds(db):
     """
     return db.query(Feed).all()
 
+
 def get_sum_of_unread(db):
+    """calculate sum of all unread entries."""
     return db.query(func.sum(Feed.unread_num)).first()[0]

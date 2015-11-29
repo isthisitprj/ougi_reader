@@ -10,6 +10,7 @@
 from datetime import datetime
 # from urllib2 import URLError
 
+
 import feedparser
 
 from models import Entry
@@ -198,7 +199,6 @@ def update_feed(feed, info=None):
         feed.url = info_and_url[1]
         if "etag" in info:
             feed.etag = info.etag
-
 
     newEntries = _get_now_entries(info, feed.id)
     if feed.entries:
